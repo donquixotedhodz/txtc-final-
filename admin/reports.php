@@ -1,12 +1,15 @@
 <?php
 session_start();
-require_once '../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: index.php');
     exit();
 }
+
+// Redirect to job orders report as this is the main reports page
+header('Location: job_orders_report.php');
+exit();
 
 // Get filter parameters from the request
 $search_customer = $_GET['search_customer'] ?? '';
@@ -994,4 +997,4 @@ require_once 'includes/header.php';
     <!-- Custom JS -->
     <script src="../js/dashboard.js"></script>
 </body>
-</html> 
+</html>

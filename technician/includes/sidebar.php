@@ -43,11 +43,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 Profile
             </a>
         </li>
-        <li class="<?= $current_page == 'reports.php' ? 'active' : '' ?>">
-            <a href="reports.php">
+        <li>
+            <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'active' : '' ?>">
                 <i class="fas fa-chart-bar"></i>
                 Reports
             </a>
+            <ul class="collapse list-unstyled <?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'show' : '' ?>" id="reportsSubmenu">
+                <li>
+                    <a href="sales_report.php" class="<?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
+                        <i class="fas fa-coins"></i>
+                        Sales Report
+                    </a>
+                </li>
+                <li>
+                    <a href="reports.php" class="<?= $current_page === 'reports.php' ? 'active' : '' ?>">
+                        <i class="fas fa-clipboard-list"></i>
+                        My Job Orders
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="#servicesSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php']) ? 'active' : '' ?>">
