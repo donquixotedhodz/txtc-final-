@@ -512,7 +512,7 @@ try {
                             <select class="form-select" name="aircon_model_id" id="edit_aircon_model_id">
                                 <option value="">Select Model</option>
                                 <?php foreach ($airconModels as $model): ?>
-                                <option value="<?= $model['id'] ?>"><?= htmlspecialchars($model['brand'] . ' - ' . $model['model_name']) ?></option>
+                                <option value="<?= $model['id'] ?>" data-price="<?= $model['price'] ?>"><?= htmlspecialchars($model['brand'] . ' - ' . $model['model_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -811,6 +811,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!order) return;
             try {
                 var orderData = JSON.parse(order);
+                // Set order ID (CRITICAL FIX)
+                document.getElementById('edit_order_id').value = orderData.id || '';
                 // Set customer info fields
                 document.getElementById('edit_customer_name').value = orderData.customer_name || '';
                 document.getElementById('edit_customer_phone').value = orderData.customer_phone || '';
@@ -838,6 +840,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('edit_status').value = orderData.status || 'pending';
             } catch (e) {
                 // Fallback: clear fields
+                document.getElementById('edit_order_id').value = '';
                 document.getElementById('edit_customer_name').value = '';
                 document.getElementById('edit_customer_phone').value = '';
                 document.getElementById('edit_customer_address').value = '';
@@ -882,4 +885,4 @@ document.addEventListener('DOMContentLoaded', function() {
         editDiscountInput.addEventListener('input', recalcEditTotal);
     }
 });
-</script> 
+</script>

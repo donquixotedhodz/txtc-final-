@@ -203,6 +203,25 @@ require_once 'includes/header.php';
                                 </tbody>
                             </table>
                         </div>
+                        
+                       <!-- Summary Section for Print -->
+                        <div class="print-summary mt-4" style="border-top: 2px solid #34495e; padding-top: 20px; display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <h5 class="mb-2" style="color: #2c3e50; font-weight: bold;">Summary</h5>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span style="font-weight: 600;">Number of Aircons Sold:</span>
+                                            <span style="font-weight: bold; color: #27ae60;"><?= count($sales) ?></span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span style="font-weight: 600;">Total Sales Amount:</span>
+                                            <span style="font-weight: bold; color: #e74c3c; font-size: 1.1em;">₱<?= number_format($total_sales, 2) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -302,6 +321,46 @@ function printSalesReport() {
     .table th:last-child,
     .table td:last-child {
         display: none !important;
+    }
+
+    /* Print summary styling */
+    .print-summary {
+        display: block !important;
+        margin-top: 30px !important;
+        padding-top: 20px !important;
+        border-top: 2px solid #34495e !important;
+        page-break-inside: avoid !important;
+    }
+
+    .print-summary h5 {
+        color: #2c3e50 !important;
+        font-weight: bold !important;
+        font-size: 14px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .print-summary .d-flex {
+        display: flex !important;
+        justify-content: space-between !important;
+        margin-bottom: 8px !important;
+        padding: 5px 0 !important;
+    }
+
+    .print-summary span {
+        font-size: 12px !important;
+    }
+
+    .print-summary span[style*="font-weight: bold"] {
+        font-weight: bold !important;
+    }
+
+    .print-summary span[style*="color: #27ae60"] {
+        color: #27ae60 !important;
+    }
+
+    .print-summary span[style*="color: #e74c3c"] {
+        color: #e74c3c !important;
+        font-size: 13px !important;
     }
 }
 </style>

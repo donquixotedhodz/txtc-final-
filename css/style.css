@@ -127,12 +127,12 @@ body {
     background-color: var(--card-2);
 }
 
-.in-progress-orders {
-    background-color: var(--card-3);
+.unique-customers {
+    background-color: #9C27B0; /* Purple for customers */
 }
 
-.pending-orders {
-    background-color: var(--card-4);
+.total-sales {
+    background-color: #FF5722; /* Orange-red for sales */
 }
 
 .card-body {
@@ -393,4 +393,4 @@ body {
 /* Adjust icon size for form-floating */
 .form-floating .password-toggle i {
     font-size: 14px;
-} 
+}
