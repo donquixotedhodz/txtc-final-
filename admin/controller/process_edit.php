@@ -37,6 +37,19 @@ try {
         exit();
     }
 
+    // Handle aircon_model_id vs part_id based on service_type
+    $service_type = $_POST['service_type'];
+    $aircon_model_id = null;
+    $part_id = null;
+    
+    if ($service_type === 'repair') {
+        // For repair orders, the aircon_model_id field contains the part ID
+        $part_id = !empty($_POST['aircon_model_id']) ? $_POST['aircon_model_id'] : null;
+    } else {
+        // For installation/survey orders, use aircon_model_id normally
+        $aircon_model_id = !empty($_POST['aircon_model_id']) ? $_POST['aircon_model_id'] : null;
+    }
+
     // Update the order
     $stmt = $pdo->prepare("
         UPDATE job_orders 
@@ -46,6 +59,7 @@ try {
             customer_address = ?,
             service_type = ?,
             aircon_model_id = ?,
+            part_id = ?,
             assigned_technician_id = ?,
             due_date = ?,
             price = ?,
@@ -58,8 +72,9 @@ try {
         $_POST['customer_name'],
         $_POST['customer_phone'],
         $_POST['customer_address'],
-        $_POST['service_type'],
-        !empty($_POST['aircon_model_id']) ? $_POST['aircon_model_id'] : null,
+        $service_type,
+        $aircon_model_id,
+        $part_id,
         !empty($_POST['assigned_technician_id']) ? $_POST['assigned_technician_id'] : null,
         $_POST['due_date'],
         $_POST['price'],
@@ -75,4 +90,4 @@ try {
     $_SESSION['error'] = "Database error: " . $e->getMessage();
     header('Location: ../edit-order.php?id=' . $_POST['order_id']);
     exit();
-} 
+}

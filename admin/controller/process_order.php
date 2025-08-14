@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 customer_phone,
                 service_type,
                 aircon_model_id,
+                part_id,
                 assigned_technician_id,
                 status,
                 price,
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 :customer_phone,
                 :service_type,
                 :aircon_model_id,
+                :part_id,
                 :assigned_technician_id,
                 :status,
                 :price,
@@ -82,13 +84,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             )
         ");
 
+        // Handle aircon_model_id vs part_id based on service_type
+        $service_type = $_POST['service_type'];
+        $aircon_model_id = null;
+        $part_id = null;
+        
+        if ($service_type === 'repair') {
+            // For repair orders, the aircon_model_id field contains the part ID
+            $part_id = $_POST['aircon_model_id'] ?: null;
+        } else {
+            // For installation/survey orders, use aircon_model_id normally
+            $aircon_model_id = $_POST['aircon_model_id'] ?: null;
+        }
+
         // Bind parameters using bindValue instead of bindParam
         $stmt->bindValue(':job_order_number', $job_order_number);
         $stmt->bindValue(':customer_name', $customer_name);
         $stmt->bindValue(':customer_address', $customer_address);
         $stmt->bindValue(':customer_phone', $customer_phone);
-        $stmt->bindValue(':service_type', $_POST['service_type']);
-        $stmt->bindValue(':aircon_model_id', $_POST['aircon_model_id'] ?: null);
+        $stmt->bindValue(':service_type', $service_type);
+        $stmt->bindValue(':aircon_model_id', $aircon_model_id);
+        $stmt->bindValue(':part_id', $part_id);
         $stmt->bindValue(':assigned_technician_id', $_POST['assigned_technician_id'] ?: null);
         $stmt->bindValue(':status', 'pending');
         $stmt->bindValue(':price', $_POST['price']);
@@ -123,4 +139,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If not POST request, redirect to orders page
     header('Location: ../orders.php');
     exit();
-} 
+}

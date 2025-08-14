@@ -27,6 +27,30 @@ body {
     background: #F5F7FA;
 }
 
+/* Dropdown menu styles */
+.dropdown-menu {
+    z-index: 1050 !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 180px;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: var(--primary-blue);
+}
+
+.dropdown-toggle::after {
+    margin-left: 8px;
+}
+
 .wrapper {
     display: flex;
     width: 100%;
@@ -125,6 +149,14 @@ body {
 
 .completed-orders {
     background-color: var(--card-2);
+}
+
+.in-progress-orders {
+    background-color: #FFC107; /* Yellow for in progress */
+}
+
+.pending-orders {
+    background-color: #DC3545; /* Red for pending */
 }
 
 .unique-customers {

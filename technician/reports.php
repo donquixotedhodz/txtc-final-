@@ -65,9 +65,15 @@ $count_stmt->execute($params);
 $total = $count_stmt->fetchColumn();
 
 // Get job orders (including cancelled)
-$sql = "SELECT job_orders.*, aircon_models.brand, aircon_models.model_name 
+$sql = "SELECT job_orders.*, 
+               aircon_models.brand, 
+               aircon_models.model_name,
+               ac_parts.part_name,
+               ac_parts.part_code,
+               ac_parts.part_category
         FROM job_orders 
         LEFT JOIN aircon_models ON job_orders.aircon_model_id = aircon_models.id 
+        LEFT JOIN ac_parts ON job_orders.part_id = ac_parts.id
         WHERE $where 
         ORDER BY job_orders.created_at DESC 
         LIMIT $limit OFFSET $offset";
@@ -213,11 +219,13 @@ require_once 'includes/header.php';
                                     <tr>
                                         <th>Order #</th>
                                         <th>Customer</th>
+                                        <th>Service Type</th>
                                         <th>Brand</th>
                                         <th>Model</th>
+                                        <th>Part Code</th>
+                                        <th>Part Name</th>
                                         <th>Price</th>
                                         <th>Status</th>
-                                        <th>Service Type</th>
                                         <th>Created At</th>
                                     </tr>
                                 </thead>
@@ -226,16 +234,82 @@ require_once 'includes/header.php';
                                         <tr>
                                             <td><?= htmlspecialchars($order['job_order_number'] ?? '') ?></td>
                                             <td><?= htmlspecialchars($order['customer_name'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($order['brand'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($order['model_name'] ?? '') ?></td>
+                                            <td>
+                                                <span class="badge 
+                                                    <?php 
+                                                    switch($order['service_type']) {
+                                                        case 'installation': echo 'bg-primary'; break;
+                                                        case 'repair': echo 'bg-warning text-dark'; break;
+                                                        case 'maintenance': echo 'bg-success'; break;
+                                                        case 'survey': echo 'bg-info'; break;
+                                                        default: echo 'bg-secondary';
+                                                    }
+                                                    ?>
+                                                ">
+                                                    <?= ucfirst(htmlspecialchars($order['service_type'] ?? '')) ?>
+                                                </span>
+                                            </td>
+                                            <!-- Brand Column -->
+                                            <td>
+                                                <?php if ($order['service_type'] == 'installation'): ?>
+                                                    <?= htmlspecialchars($order['brand'] ?? 'N/A') ?>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <!-- Model Column -->
+                                            <td>
+                                                <?php if ($order['service_type'] == 'installation'): ?>
+                                                    <?= htmlspecialchars($order['model_name'] ?? 'N/A') ?>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <!-- Part Code Column -->
+                                            <td>
+                                                <?php if ($order['service_type'] == 'repair'): ?>
+                                                    <?php if (!empty($order['part_name'])): ?>
+                                                        <?= htmlspecialchars($order['part_code'] ?? 'N/A') ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">Not specified</span>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <!-- Part Name Column -->
+                                            <td>
+                                                <?php if ($order['service_type'] == 'repair'): ?>
+                                                    <?php if (!empty($order['part_name'])): ?>
+                                                        <?= htmlspecialchars($order['part_name'] ?? 'N/A') ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">Not specified</span>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>₱<?= number_format($order['price'] ?? 0,2) ?></td>
-                                            <td><?= htmlspecialchars($order['status'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($order['service_type'] ?? '') ?></td>
+                                            <td>
+                                                <?php
+                                                $status_class = '';
+                                                switch($order['status']) {
+                                                    case 'pending': $status_class = 'bg-secondary'; break;
+                                                    case 'in_progress': $status_class = 'bg-info'; break;
+                                                    case 'completed': $status_class = 'bg-success'; break;
+                                                    case 'cancelled': $status_class = 'bg-danger'; break;
+                                                    default: $status_class = 'bg-secondary';
+                                                }
+                                                ?>
+                                                <span class="badge <?= $status_class ?>">
+                                                    <?= ucfirst(htmlspecialchars($order['status'] ?? '')) ?>
+                                                </span>
+                                            </td>
                                             <td><?= htmlspecialchars($order['created_at'] ?? '') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                     <?php if (empty($orders)): ?>
-                                        <tr><td colspan="8" class="text-center">No job orders found.</td></tr>
+                                        <tr><td colspan="10" class="text-center">No job orders found.</td></tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
@@ -260,6 +334,22 @@ require_once 'includes/header.php';
                                         <div class="d-flex justify-content-between mb-2">
                             <span style="font-weight: 600;">Total Job Orders:</span>
                             <span style="font-weight: bold; color: #27ae60;"><?= $total ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-weight: 600;">Repair Orders:</span>
+                            <span style="font-weight: bold; color: #f39c12;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'repair'; })) ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-weight: 600;">Installation Orders:</span>
+                            <span style="font-weight: bold; color: #3498db;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'installation'; })) ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-weight: 600;">Maintenance Orders:</span>
+                            <span style="font-weight: bold; color: #27ae60;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'maintenance'; })) ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-weight: 600;">Survey Orders:</span>
+                            <span style="font-weight: bold; color: #17a2b8;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'survey'; })) ?></span>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span style="font-weight: 600;">Filter Applied:</span>

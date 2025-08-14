@@ -63,6 +63,10 @@ try {
     $stmt = $pdo->query("SELECT id, model_name, brand, price FROM aircon_models");
     $airconModels = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Get AC parts for dropdown (for repair orders)
+    $stmt = $pdo->query("SELECT id, part_name, part_code, part_category, unit_price FROM ac_parts ORDER BY part_name");
+    $acParts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     // Get all customers with at least one job order (grouped)
     $sql = "
         SELECT 
@@ -240,8 +244,8 @@ require_once 'includes/header.php';
                                 <input type="text" class="form-control" id="display_service_type" readonly>
                             </div>
                             <div class="col-md-6" id="aircon_model_section">
-                                <label class="form-label">Aircon Model <small class="text-muted">(Optional for Survey)</small></label>
-                                <select class="form-select" name="aircon_model_id">
+                                <label class="form-label" id="aircon_model_label">Aircon Model <small class="text-muted">(Optional for Survey)</small></label>
+                                <select class="form-select" name="aircon_model_id" id="aircon_model_select">
                                     <option value="">Select Model</option>
                                     <?php foreach ($airconModels as $model): ?>
                                     <option value="<?= $model['id'] ?>"><?= htmlspecialchars($model['brand'] . ' - ' . $model['model_name']) ?></option>
@@ -318,7 +322,7 @@ require_once 'includes/header.php';
                                 <input type="text" class="form-control" name="service_type" id="edit_service_type" readonly>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Aircon Model</label>
+                                <label class="form-label" id="edit_aircon_model_label">Aircon Model</label>
                                 <select class="form-select" name="aircon_model_id" id="edit_aircon_model_id">
                                     <option value="">Select Model</option>
                                     <?php foreach ($airconModels as $model): ?>
@@ -569,6 +573,92 @@ require_once 'includes/header.php';
                     document.getElementById('customer_address').readOnly = !!btn.getAttribute('data-customer-address');
                 });
             });
+        });
+
+        // DYNAMIC LABEL CHANGE FOR AIRCON MODEL/AC PARTS
+        function updateAirconModelLabel(serviceType, labelId, selectId) {
+            const label = document.getElementById(labelId);
+            const select = document.getElementById(selectId);
+            
+            // Clear existing options except the first one
+            while (select.children.length > 1) {
+                select.removeChild(select.lastChild);
+            }
+            
+            if (serviceType === 'repair') {
+                if (labelId === 'aircon_model_label') {
+                    label.innerHTML = 'AC Parts <small class="text-muted">(Optional for Survey)</small>';
+                } else {
+                    label.textContent = 'AC Parts';
+                }
+                select.querySelector('option[value=""]').textContent = 'Select Parts';
+                
+                // Populate with AC parts
+                const acParts = <?= json_encode($acParts) ?>;
+                acParts.forEach(part => {
+                    const option = document.createElement('option');
+                    option.value = part.id;
+                    option.textContent = `${part.part_name} - ${part.part_code || 'N/A'} (₱${parseFloat(part.unit_price).toFixed(2)})`;
+                    option.setAttribute('data-price', part.unit_price);
+                    select.appendChild(option);
+                });
+            } else {
+                if (labelId === 'aircon_model_label') {
+                    label.innerHTML = 'Aircon Model <small class="text-muted">(Optional for Survey)</small>';
+                } else {
+                    label.textContent = 'Aircon Model';
+                }
+                select.querySelector('option[value=""]').textContent = 'Select Model';
+                
+                // Populate with aircon models
+                const airconModels = <?= json_encode($airconModels) ?>;
+                airconModels.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = `${model.brand} - ${model.model_name}`;
+                    option.setAttribute('data-price', model.price);
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        // Listen for service type changes in add modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // For the main add order form - listen to display_service_type changes
+            const displayServiceType = document.getElementById('display_service_type');
+            if (displayServiceType) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                            updateAirconModelLabel(displayServiceType.value, 'aircon_model_label', 'aircon_model_select');
+                        }
+                    });
+                });
+                observer.observe(displayServiceType, { attributes: true, attributeFilter: ['value'] });
+                
+                // Also listen for input events
+                displayServiceType.addEventListener('input', function() {
+                    updateAirconModelLabel(this.value, 'aircon_model_label', 'aircon_model_select');
+                });
+            }
+
+            // For the edit modal - listen to edit_service_type changes
+            const editServiceType = document.getElementById('edit_service_type');
+            if (editServiceType) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                            updateAirconModelLabel(editServiceType.value, 'edit_aircon_model_label', 'edit_aircon_model_id');
+                        }
+                    });
+                });
+                observer.observe(editServiceType, { attributes: true, attributeFilter: ['value'] });
+                
+                // Also listen for input events
+                editServiceType.addEventListener('input', function() {
+                    updateAirconModelLabel(this.value, 'edit_aircon_model_label', 'edit_aircon_model_id');
+                });
+            }
         });
     </script>
 </body>

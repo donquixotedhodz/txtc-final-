@@ -230,6 +230,10 @@ require_once 'includes/header.php';
                                 <span style="font-weight: 600;">Number of Transactions:</span>
                                 <span style="font-weight: bold; color: #27ae60;"><?= count($sales) ?></span>
                             </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span style="font-weight: 600;">Average Sale:</span>
+                                <span style="font-weight: bold; color: #3498db;">₱<?= number_format(count($sales) > 0 ? $total_sales / count($sales) : 0, 2) ?></span>
+                            </div>
                             <div class="d-flex justify-content-between">
                                 <span style="font-weight: 600;">Total Sales Amount:</span>
                                 <span style="font-weight: bold; color: #e74c3c; font-size: 1.1em;">₱<?= number_format($total_sales, 2) ?></span>

@@ -65,15 +65,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </ul>
         </li>
         <li>
-            <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['settings/index.php', 'aircon_models.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['settings/index.php', 'aircon_models.php']) ? 'active' : '' ?>">
+            <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'active' : '' ?>">
                 <i class="fas fa-cog"></i>
                 Settings
             </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page, ['settings/index.php', 'aircon_models.php']) ? 'show' : '' ?>" id="settingsSubmenu">
+            <ul class="collapse list-unstyled <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'show' : '' ?>" id="settingsSubmenu">
                 <li>
-                    <a href="../settings/index.php" class="<?= $current_page === 'settings/index.php' ? 'active' : '' ?>">
+                    <a href="../settings/index.php" class="<?= $current_page === 'index.php' || $current_page === 'settings/index.php' ? 'active' : '' ?>">
                         <i class="fas fa-user-shield"></i>
-                        Admin Settings
+                        Account Settings
                     </a>
                 </li>
                 <li>
@@ -81,6 +81,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="fas fa-snowflake"></i>
                         Aircon Models
                     </a>
+                </li>
+                     <li>
+                    <a href="../view/estimation.php" class="<?= $current_page === 'estimation.php' || $current_page === 'view/estimation.php' ? 'active' : '' ?>">
+                            <i class="fas fa-calculator"></i>
+                            Services
+                        </a>
                 </li>
             </ul>
         </li>

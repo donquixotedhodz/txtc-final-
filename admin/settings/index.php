@@ -24,7 +24,7 @@ try {
 }
 require_once 'includes/header.php';
 ?>
-<body></body>
+<body>
  <div class="wrapper">
         <?php
         // Include sidebar
@@ -40,19 +40,29 @@ require_once 'includes/header.php';
                     </button>
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
-                            <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?? $_SESSION['username']) . '&background=1a237e&color=fff' ?>" 
+                            <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                      alt="Admin" 
                                      class="rounded-circle me-2" 
                                      width="32" 
                                      height="32"
-                                     style="object-fit: cover;">
-                                <span class="me-3">Welcome, <?= htmlspecialchars($admin['name'] ?? $_SESSION['username']) ?></span>
+                                     style="object-fit: cover; border: 2px solid #4A90E2;">
+                                <span class="me-3">Welcome, <?= htmlspecialchars($admin['name'] ?: 'Admin') ?></span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../view/profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="../view/profile.php">
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        <span>Profile</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2"></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="../logout.php">
+                                        <i class="fas fa-sign-out-alt me-2"></i>
+                                        <span>Logout</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -60,7 +70,7 @@ require_once 'includes/header.php';
             </nav>
 
             <div class="container-fluid">
-                <h2 class="mb-4">Admin Settings</h2>
+                <h2 class="mb-4">Account Settings</h2>
 
                 <!-- Alert Messages -->
                 <?php if (isset($_SESSION['success_message'])): ?>
@@ -96,11 +106,6 @@ require_once 'includes/header.php';
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <!-- Include any necessary custom JS -->
 
     <!-- Change Password Modal -->
     <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
@@ -202,10 +207,22 @@ require_once 'includes/header.php';
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+   <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+<!-- <script src="../../js/dashboard.js"></script> -->
     <script>
+          // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarCollapse = document.getElementById('sidebarCollapse');
+            if (sidebarCollapse) {
+                sidebarCollapse.addEventListener('click', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('active');
+                    }
+                });
+            }
+        });
         // Password toggle functionality
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('adminPassword');
@@ -242,4 +259,4 @@ require_once 'includes/header.php';
         });
     </script>
 </body>
-</html> 
+</html>

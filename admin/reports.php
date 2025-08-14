@@ -481,9 +481,9 @@ require_once 'includes/header.php';
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
-                                                    <a href="view-order.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary view-order-btn" data-bs-toggle="modal" data-bs-target="#viewOrderModal" data-order-id="<?= $order['id'] ?>" title="View Details">
                                                         <i class="fas fa-eye"></i>
-                                                    </a>
+                                                    </button>
                                                     <?php if ($order['status'] !== 'completed' && $order['status'] !== 'cancelled'): ?>
                                                         <a href="edit-order.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Edit Order">
                                                             <i class="fas fa-edit"></i>

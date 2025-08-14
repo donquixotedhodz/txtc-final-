@@ -21,9 +21,14 @@ try {
     $stmt = $pdo->prepare("
         SELECT 
             jo.*,
-            COALESCE(am.model_name, 'Not Specified') as model_name 
+            COALESCE(am.model_name, 'Not Specified') as model_name,
+            am.brand,
+            ap.part_name,
+            ap.part_code,
+            ap.part_category
         FROM job_orders jo 
         LEFT JOIN aircon_models am ON jo.aircon_model_id = am.id 
+        LEFT JOIN ac_parts ap ON jo.part_id = ap.id
         WHERE jo.assigned_technician_id = ? 
         AND jo.status IN ('completed', 'cancelled')
         ORDER BY 
@@ -185,12 +190,12 @@ try {
                                                 <td><?= date('M d, Y', strtotime($order['completed_at'])) ?></td>
                                                 <td>
                                                     <div class="d-flex justify-content-center">
-                                                        <a href="view-order.php?id=<?= $order['id'] ?>" 
-                                                           class="btn btn-sm btn-light" 
-                                                           data-bs-toggle="tooltip" 
-                                                           title="View Details">
+                                                        <button class="btn btn-sm btn-light" 
+                                                                onclick="viewOrder(<?= $order['id'] ?>)" 
+                                                                data-bs-toggle="tooltip" 
+                                                                title="View Details">
                                                             <i class="fas fa-eye text-primary"></i>
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -205,9 +210,133 @@ try {
         </div>
     </div>
 
+    <!-- View Order Modal -->
+    <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewOrderModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Customer Information</h6>
+                            <p><strong>Name:</strong> <span id="modal_customer_name"></span></p>
+                            <p><strong>Phone:</strong> <span id="modal_customer_phone"></span></p>
+                            <p><strong>Address:</strong> <span id="modal_customer_address"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Service Information</h6>
+                            <p><strong>Service Type:</strong> <span id="modal_service_type"></span></p>
+                            <p><strong>Description:</strong> <span id="modal_description"></span></p>
+                            
+                            <!-- Aircon Model Section -->
+                            <div id="aircon_model_section">
+                                <p><strong>Brand:</strong> <span id="modal_brand"></span></p>
+                                <p><strong>Model:</strong> <span id="modal_model"></span></p>
+                            </div>
+                            
+                            <!-- AC Parts Section -->
+                            <div id="ac_parts_section" style="display: none;">
+                                <p><strong>Part Name:</strong> <span id="modal_part_name"></span></p>
+                                <p><strong>Part Code:</strong> <span id="modal_part_code"></span></p>
+                                <p><strong>Part Category:</strong> <span id="modal_part_category"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Status & Pricing</h6>
+                            <p><strong>Status:</strong> <span id="modal_status"></span></p>
+                            <p><strong>Price:</strong> ₱<span id="modal_price"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Technician Information</h6>
+                            <p><strong>Assigned Technician:</strong> <span id="modal_technician"></span></p>
+                            <p><strong>Created:</strong> <span id="modal_created_at"></span></p>
+                            <p><strong>Completed:</strong> <span id="modal_completed_at"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="../js/dashboard.js"></script>
+    
+    <script>
+    function viewOrder(orderId) {
+        fetch('../admin/controller/get_order_details.php?id=' + orderId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const order = data.order;
+                    
+                    // Populate customer information
+                    document.getElementById('modal_customer_name').textContent = order.customer_name || 'N/A';
+                    document.getElementById('modal_customer_phone').textContent = order.customer_phone || 'N/A';
+                    document.getElementById('modal_customer_address').textContent = order.customer_address || 'N/A';
+                    
+                    // Populate service information
+                    document.getElementById('modal_service_type').textContent = order.service_type ? order.service_type.charAt(0).toUpperCase() + order.service_type.slice(1) : 'N/A';
+                    document.getElementById('modal_description').textContent = order.description || 'N/A';
+                    
+                    // Show/hide sections based on service type
+                    const airconSection = document.getElementById('aircon_model_section');
+                    const partsSection = document.getElementById('ac_parts_section');
+                    
+                    if (order.service_type === 'repair') {
+                        // Show AC parts information for repair orders
+                        airconSection.style.display = 'none';
+                        partsSection.style.display = 'block';
+                        
+                        document.getElementById('modal_part_name').textContent = order.part_name || 'Not specified';
+                        document.getElementById('modal_part_code').textContent = order.part_code || 'Not specified';
+                        document.getElementById('modal_part_category').textContent = order.part_category || 'Not specified';
+                    } else {
+                        // Show aircon model information for other service types
+                        airconSection.style.display = 'block';
+                        partsSection.style.display = 'none';
+                        
+                        document.getElementById('modal_brand').textContent = order.brand || 'N/A';
+                        document.getElementById('modal_model').textContent = order.model_name || 'N/A';
+                    }
+                    
+                    // Populate status and pricing
+                    const statusBadge = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'N/A';
+                    document.getElementById('modal_status').innerHTML = `<span class="badge bg-${order.status === 'completed' ? 'success' : 'danger'}">${statusBadge}</span>`;
+                    document.getElementById('modal_price').textContent = order.price ? parseFloat(order.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
+                    
+                    // Populate technician information
+                    document.getElementById('modal_technician').textContent = order.technician_name || 'N/A';
+                    document.getElementById('modal_created_at').textContent = order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A';
+                    document.getElementById('modal_completed_at').textContent = order.completed_at ? new Date(order.completed_at).toLocaleString() : 'N/A';
+                    
+                    // Show the modal
+                    const modal = new bootstrap.Modal(document.getElementById('viewOrderModal'));
+                    modal.show();
+                } else {
+                    alert('Error loading order details: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading order details');
+            });
+    }
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+    </script>
 </body>
-</html> 
+</html>

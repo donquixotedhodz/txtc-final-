@@ -153,37 +153,41 @@ require_once 'includes/header.php';
                                                 <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
                                                 <td>
                                                     <div class="d-flex justify-content-center gap-2">
-                                                        <a href="view-order.php?id=<?= $order['id'] ?>" 
-                                                           class="btn btn-sm btn-light" 
-                                                           data-bs-toggle="tooltip" 
-                                                           title="View Details">
+                                                        <button 
+                                                            class="btn btn-sm btn-light view-order-btn" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#viewOrderModal"
+                                                            data-order-id="<?= $order['id'] ?>"
+                                                            title="View Details">
                                                             <i class="fas fa-eye text-primary"></i>
-                                                        </a>
+                                                        </button>
                                                         <?php if ($order['status'] === 'pending'): ?>
                                                             <a href="update-status.php?id=<?= $order['id'] ?>&status=in_progress" 
-                                                               class="btn btn-sm btn-light" 
+                                                               class="btn btn-sm btn-success" 
                                                                data-bs-toggle="tooltip" 
                                                                title="Start Work">
-                                                                <i class="fas fa-play text-success"></i>
+                                                                <i class="fas fa-check"></i>
                                                             </a>
                                                             <a href="update-status.php?id=<?= $order['id'] ?>&status=cancelled" 
-                                                               class="btn btn-sm btn-light" 
+                                                               class="btn btn-sm btn-danger" 
                                                                data-bs-toggle="tooltip" 
-                                                               title="Cancel Order">
-                                                                <i class="fas fa-times text-danger"></i>
+                                                               title="Cancel Order"
+                                                               onclick="return confirm('Are you sure you want to cancel this order?');">
+                                                                <i class="fas fa-trash"></i>
                                                             </a>
                                                         <?php elseif ($order['status'] === 'in_progress'): ?>
                                                             <a href="update-status.php?id=<?= $order['id'] ?>&status=completed" 
-                                                               class="btn btn-sm btn-light" 
+                                                               class="btn btn-sm btn-primary" 
                                                                data-bs-toggle="tooltip" 
                                                                title="Mark as Completed">
-                                                                <i class="fas fa-check text-success"></i>
+                                                                <i class="fas fa-check-double"></i>
                                                             </a>
                                                             <a href="update-status.php?id=<?= $order['id'] ?>&status=cancelled" 
-                                                               class="btn btn-sm btn-light" 
+                                                               class="btn btn-sm btn-danger" 
                                                                data-bs-toggle="tooltip" 
-                                                               title="Cancel Order">
-                                                                <i class="fas fa-times text-danger"></i>
+                                                               title="Cancel Order"
+                                                               onclick="return confirm('Are you sure you want to cancel this order?');">
+                                                                <i class="fas fa-trash"></i>
                                                             </a>
                                                         <?php endif; ?>
                                                     </div>
@@ -204,12 +208,217 @@ require_once 'includes/header.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="../js/dashboard.js"></script>
+    <!-- View Order Modal -->
+    <div class="modal fade" id="viewOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Customer Information -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Customer Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Name</label>
+                                        <p class="mb-0" id="view_customer_name">-</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Phone</label>
+                                        <p class="mb-0" id="view_customer_phone">-</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label text-muted">Address</label>
+                                        <p class="mb-0" id="view_customer_address">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Service Information -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Service Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Service Type</label>
+                                        <p class="mb-0" id="view_service_type">-</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Aircon Model</label>
+                                        <p class="mb-0" id="view_aircon_model">-</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label text-muted">Job Order Number</label>
+                                        <p class="mb-0" id="view_job_order_number">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Information -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Status Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Current Status</label>
+                                        <p class="mb-0" id="view_status">-</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Created Date</label>
+                                        <p class="mb-0" id="view_created_date">-</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label text-muted">Last Updated</label>
+                                        <p class="mb-0" id="view_updated_date">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing Information -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Pricing Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Base Price</label>
+                                        <p class="mb-0" id="view_base_price">-</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Additional Fee</label>
+                                        <p class="mb-0" id="view_additional_fee">-</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted">Discount</label>
+                                        <p class="mb-0" id="view_discount">-</p>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label text-muted">Total Price</label>
+                                        <p class="mb-0 fw-bold text-primary" id="view_total_price">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Technician Information -->
+                        <div class="col-12" id="view_technician_section" style="display: none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Assigned Technician</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <img id="view_technician_avatar" src="" alt="Technician" class="rounded-circle me-3" width="48" height="48">
+                                        <div>
+                                            <h6 class="mb-1" id="view_technician_name">-</h6>
+                                            <p class="text-muted mb-0" id="view_technician_phone">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
+        
+        // View Order Modal Population
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.view-order-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var orderId = this.getAttribute('data-order-id');
+                    if (!orderId) return;
+                    
+                    // Set order ID for print button
+                    document.getElementById('viewOrderModal').dataset.orderId = orderId;
+                    
+                    // Fetch order details via AJAX
+                    fetch('../admin/controller/get_order_details.php?id=' + orderId)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                var order = data.order;
+                                
+                                // Populate customer information
+                                document.getElementById('view_customer_name').textContent = order.customer_name || '-';
+                                document.getElementById('view_customer_phone').textContent = order.customer_phone || '-';
+                                document.getElementById('view_customer_address').textContent = order.customer_address || '-';
+                                
+                                // Populate service information
+                                document.getElementById('view_service_type').textContent = order.service_type ? order.service_type.charAt(0).toUpperCase() + order.service_type.slice(1) : '-';
+                                document.getElementById('view_aircon_model').textContent = order.model_name || 'Not Specified';
+                                document.getElementById('view_job_order_number').textContent = order.job_order_number || '-';
+                                
+                                // Populate status information
+                                var statusBadge = '<span class="badge bg-' + 
+                                    (order.status === 'completed' ? 'success' : 
+                                    (order.status === 'in_progress' ? 'warning' : 
+                                    (order.status === 'pending' ? 'danger' : 'secondary'))) + '">' + 
+                                    (order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ') : '-') + '</span>';
+                                document.getElementById('view_status').innerHTML = statusBadge;
+                                
+                                document.getElementById('view_created_date').textContent = order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+                                document.getElementById('view_updated_date').textContent = order.updated_at ? new Date(order.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+                                
+                                // Populate pricing information
+                                document.getElementById('view_base_price').textContent = order.base_price ? '₱' + parseFloat(order.base_price).toFixed(2) : '₱0.00';
+                                document.getElementById('view_additional_fee').textContent = order.additional_fee ? '₱' + parseFloat(order.additional_fee).toFixed(2) : '₱0.00';
+                                document.getElementById('view_discount').textContent = order.discount ? '₱' + parseFloat(order.discount).toFixed(2) : '₱0.00';
+                                document.getElementById('view_total_price').textContent = order.price ? '₱' + parseFloat(order.price).toFixed(2) : '₱0.00';
+                                
+                                // Populate technician information
+                                var techSection = document.getElementById('view_technician_section');
+                                if (order.technician_name) {
+                                    techSection.style.display = 'block';
+                                    document.getElementById('view_technician_name').textContent = order.technician_name;
+                                    document.getElementById('view_technician_phone').textContent = order.technician_phone || 'N/A';
+                                    
+                                    // Set technician avatar
+                                    var avatar = document.getElementById('view_technician_avatar');
+                                    if (order.technician_profile) {
+                                        avatar.src = '../' + order.technician_profile;
+                                    } else {
+                                        avatar.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(order.technician_name) + '&background=1a237e&color=fff';
+                                    }
+                                } else {
+                                    techSection.style.display = 'none';
+                                }
+                            } else {
+                                alert('Error loading order details: ' + (data.message || 'Unknown error'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error loading order details. Please try again.');
+                        });
+                });
+            });
+        });
     </script>
 </body>
-</html> 
+</html>

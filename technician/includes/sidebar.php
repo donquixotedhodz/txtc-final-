@@ -64,11 +64,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </ul>
         </li>
         <li>
-            <a href="#servicesSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php']) ? 'active' : '' ?>">
+            <a href="#servicesSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'estimation_builder.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'estimation_builder.php']) ? 'active' : '' ?>">
                 <i class="fas fa-tools"></i>
                 Services
             </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php']) ? 'show' : '' ?>" id="servicesSubmenu">
+            <ul class="collapse list-unstyled <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'visual_estimation.php', 'estimation_builder.php']) ? 'show' : '' ?>" id="servicesSubmenu">
                 <li>
                     <a href="aircon_brands.php" class="<?= ($current_page ?? '') === 'aircon_brands.php' ? 'active' : '' ?>">
                         <i class="fas fa-snowflake"></i>
@@ -76,9 +76,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 <li>
-                    <a href="repair.php" class="<?= ($current_page ?? '') === 'repair.php' ? 'active' : '' ?>">
-                        <i class="fas fa-wrench"></i>
-                        Repair
+                    <a href="estimation_builder.php" class="<?= ($current_page ?? '') === 'estimation_builder.php' ? 'active' : '' ?>">
+                        <i class="fas fa-calculator"></i>
+                        Estimation Builder
                     </a>
                 </li>
             </ul>
