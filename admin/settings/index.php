@@ -18,7 +18,8 @@ try {
     $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Get all admins
-    // ... existing code ...
+    $stmt = $pdo->query("SELECT * FROM admins ORDER BY id DESC");
+    $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     // ... existing code ...
 }
@@ -69,73 +70,90 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <h2 class="mb-4">Account Settings</h2>
+<div class="container mt-4">
+    <h3>Admin Management</h3>
 
-                <!-- Alert Messages -->
-                <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?= htmlspecialchars($_SESSION['success_message']) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <?php unset($_SESSION['success_message']); endif; ?>
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
+    <?php endif; ?>
 
-                <?php if (isset($_SESSION['error_message'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= htmlspecialchars($_SESSION['error_message']) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <?php unset($_SESSION['error_message']); endif; ?>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="selection-card" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-                            <i class="fas fa-key"></i>
-                            <h5>Change Password</h5>
-                            <p>Update your account password securely</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="selection-card" data-bs-toggle="modal" data-bs-target="#createAdminModal">
-                            <i class="fas fa-user-plus"></i>
-                            <h5>Create Additional Admin</h5>
-                            <p>Add new administrators to the system</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Add New Admin</h5>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAdminModal">
+                <i class="fas fa-user-plus me-2"></i>Create New Admin
+            </button>
         </div>
     </div>
 
-    <!-- Change Password Modal -->
-    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Change Password Form -->
-                    <form action="controller/change_password.php" method="POST">
-                        <div class="mb-3">
-                            <label for="currentPassword" class="form-label">Current Password</label>
-                            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newPassword" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" name="new_password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmNewPassword" name="confirm_new_password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Change Password</button>
-                    </form>
+    <div class="card">
+        <div class="card-body">
+            <h6 class="mb-3">Existing Admins</h6>
+            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Profile</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($admins)): ?>
+                            <?php foreach ($admins as $adminUser): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($adminUser['id'] ?? '') ?></td>
+                                    <td>
+                                        <img src="<?= !empty($adminUser['profile_picture']) ? '../../' . htmlspecialchars($adminUser['profile_picture'] ?? '') : 'https://ui-avatars.com/api/?name=' . urlencode($adminUser['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                             alt="Admin" 
+                                             class="rounded-circle" 
+                                             width="32" 
+                                             height="32"
+                                             style="object-fit: cover; border: 2px solid #4A90E2;">
+                                    </td>
+                                    <td><?= htmlspecialchars($adminUser['name'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($adminUser['username'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($adminUser['email'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($adminUser['phone'] ?? '') ?></td>
+                                    <td>
+                                        <!-- Edit Button -->
+                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal_<?= $adminUser['id'] ?>" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <!-- Delete Button -->
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="confirmDelete(<?= $adminUser['id'] ?>)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="7" class="text-center">No admins found.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                    </table>
                 </div>
             </div>
+            <!-- Delete form (hidden, JS will submit this) -->
+            <form id="deleteForm" method="post" action="controller/delete_admin.php" style="display:none;">
+                <input type="hidden" name="delete_admin" value="1">
+                <input type="hidden" name="admin_id" id="deleteAdminId">
+            </form>
         </div>
     </div>
+</div>
+        </div>
+    </div>
+
+
 
     <!-- Create Additional Admin Modal -->
     <div class="modal fade" id="createAdminModal" tabindex="-1" aria-labelledby="createAdminModalLabel" aria-hidden="true">
@@ -207,6 +225,61 @@ require_once 'includes/header.php';
         </div>
     </div>
 
+<!-- All Edit Modals -->
+<?php if (count($admins)): ?>
+    <?php foreach ($admins as $adminUser): ?>
+        <div class="modal fade" id="editModal_<?= $adminUser['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel_<?= $adminUser['id'] ?>" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form method="post" action="controller/edit_admin.php" class="modal-content" enctype="multipart/form-data">
+                    <input type="hidden" name="edit_admin" value="1">
+                    <input type="hidden" name="admin_id" value="<?= $adminUser['id'] ?>">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel_<?= $adminUser['id'] ?>">Edit Admin</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($adminUser['name'] ?? '') ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($adminUser['username'] ?? '') ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($adminUser['email'] ?? '') ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control" value="<?= htmlspecialchars($adminUser['phone'] ?? '') ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">New Password (leave blank to keep current)</label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Profile Picture</label>
+                                    <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                                    <small class="text-muted">Max file size: 2MB. Leave blank to keep current picture.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- <script src="../../js/dashboard.js"></script> -->
@@ -223,7 +296,7 @@ require_once 'includes/header.php';
                 });
             }
         });
-        // Password toggle functionality
+        // Password toggle functionality for create admin modal
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('adminPassword');
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -239,6 +312,17 @@ require_once 'includes/header.php';
             this.querySelector('i').classList.toggle('fa-eye');
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
+
+        // Confirm delete function
+        function confirmDelete(id) {
+            if (confirm('Are you sure you want to delete this admin?')) {
+                document.getElementById('deleteAdminId').value = id;
+                document.getElementById('deleteForm').submit();
+            }
+        }
+
+        // Make confirmDelete function global
+        window.confirmDelete = confirmDelete;
 
         // File size validation
         document.getElementById('adminProfilePicture').addEventListener('change', function() {

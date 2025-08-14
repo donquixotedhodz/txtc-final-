@@ -21,58 +21,64 @@ try {
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Handle Aircon Model form submission
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_aircon_model'])) {
-        $brand = trim($_POST['brand'] ?? '');
-        $model_name = trim($_POST['model_name'] ?? '');
-        $price = trim($_POST['price'] ?? '');
+    // Handle Cleaning Service form submission
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_cleaning_service'])) {
+        $service_name = trim($_POST['service_name'] ?? '');
+        $service_description = trim($_POST['service_description'] ?? '');
+        $service_type = trim($_POST['service_type'] ?? '');
+        $base_price = trim($_POST['base_price'] ?? '');
+        $unit_type = trim($_POST['unit_type'] ?? '');
+        $aircon_type = trim($_POST['aircon_type'] ?? '');
 
-        if ($brand && $model_name && is_numeric($price)) {
-            $stmt = $pdo->prepare("INSERT INTO aircon_models (brand, model_name, price) VALUES (?, ?, ?)");
-            $stmt->execute([$brand, $model_name, $price]);
-            $_SESSION['success_message'] = "Aircon model added successfully!";
-            header("Location: aircon_models.php");
+        if ($service_name && $service_description && $service_type && is_numeric($base_price)) {
+            $stmt = $pdo->prepare("INSERT INTO cleaning_services (service_name, service_description, service_type, base_price, unit_type, aircon_type) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$service_name, $service_description, $service_type, $base_price, $unit_type, $aircon_type]);
+            $_SESSION['success_message'] = "Cleaning service added successfully!";
+            header("Location: cleaning_services.php");
             exit;
         } else {
             $_SESSION['error_message'] = "Please fill in all fields correctly.";
-            header("Location: aircon_models.php");
+            header("Location: cleaning_services.php");
             exit;
         }
     }
 
-    // Handle Edit Aircon Model
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['edit_aircon_model'])) {
-        $model_id = intval($_POST['model_id']);
-        $brand = trim($_POST['brand'] ?? '');
-        $model_name = trim($_POST['model_name'] ?? '');
-        $price = trim($_POST['price'] ?? '');
+    // Handle Edit Cleaning Service
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['edit_cleaning_service'])) {
+        $service_id = intval($_POST['service_id']);
+        $service_name = trim($_POST['service_name'] ?? '');
+        $service_description = trim($_POST['service_description'] ?? '');
+        $service_type = trim($_POST['service_type'] ?? '');
+        $base_price = trim($_POST['base_price'] ?? '');
+        $unit_type = trim($_POST['unit_type'] ?? '');
+        $aircon_type = trim($_POST['aircon_type'] ?? '');
 
-        if ($brand && $model_name && is_numeric($price)) {
-            $stmt = $pdo->prepare("UPDATE aircon_models SET brand = ?, model_name = ?, price = ? WHERE id = ?");
-            $stmt->execute([$brand, $model_name, $price, $model_id]);
-            $_SESSION['success_message'] = "Aircon model updated successfully!";
-            header("Location: aircon_models.php");
+        if ($service_name && $service_description && $service_type && is_numeric($base_price)) {
+            $stmt = $pdo->prepare("UPDATE cleaning_services SET service_name = ?, service_description = ?, service_type = ?, base_price = ?, unit_type = ?, aircon_type = ? WHERE id = ?");
+            $stmt->execute([$service_name, $service_description, $service_type, $base_price, $unit_type, $aircon_type, $service_id]);
+            $_SESSION['success_message'] = "Cleaning service updated successfully!";
+            header("Location: cleaning_services.php");
             exit;
         } else {
             $_SESSION['error_message'] = "Please fill in all fields correctly.";
-            header("Location: aircon_models.php");
+            header("Location: cleaning_services.php");
             exit;
         }
     }
 
-    // Handle Delete Aircon Model
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_aircon_model'])) {
-        $model_id = intval($_POST['model_id']);
-        $stmt = $pdo->prepare("DELETE FROM aircon_models WHERE id = ?");
-        $stmt->execute([$model_id]);
-        $_SESSION['success_message'] = "Aircon model deleted successfully!";
-        header("Location: aircon_models.php");
+    // Handle Delete Cleaning Service
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_cleaning_service'])) {
+        $service_id = intval($_POST['service_id']);
+        $stmt = $pdo->prepare("DELETE FROM cleaning_services WHERE id = ?");
+        $stmt->execute([$service_id]);
+        $_SESSION['success_message'] = "Cleaning service deleted successfully!";
+        header("Location: cleaning_services.php");
         exit;
     }
 
-    // Fetch all aircon models
-    $stmt = $pdo->query("SELECT * FROM aircon_models ORDER BY id DESC");
-    $airconModels = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Fetch all cleaning services
+    $stmt = $pdo->query("SELECT * FROM cleaning_services ORDER BY id DESC");
+    $cleaningServices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
@@ -126,7 +132,7 @@ require_once 'includes/header.php';
             </nav>
 
 <div class="container mt-4">
-    <h3>Aircon Models Management</h3>
+    <h3>Cleaning Services Management</h3>
 
     <?php if (isset($_SESSION['success_message'])): ?>
         <div class="alert alert-success"><?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
@@ -137,20 +143,46 @@ require_once 'includes/header.php';
 
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title mb-3">Add Aircon Model</h5>
+            <h5 class="card-title mb-3">Add Cleaning Service</h5>
             <form method="post" class="row g-3">
-                <input type="hidden" name="add_aircon_model" value="1">
-                <div class="col-md-4">
-                    <input type="text" name="brand" class="form-control" placeholder="Brand" required>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="model_name" class="form-control" placeholder="Model Name" required>
+                <input type="hidden" name="add_cleaning_service" value="1">
+                <div class="col-md-3">
+                    <input type="text" name="service_name" class="form-control" placeholder="Service Name" required>
                 </div>
                 <div class="col-md-3">
-                    <input type="number" name="price" class="form-control" placeholder="Price" step="0.01" min="0" required>
+                    <textarea name="service_description" class="form-control" placeholder="Service Description" rows="1" required></textarea>
+                </div>
+                <div class="col-md-2">
+                    <select name="service_type" class="form-control" required>
+                        <option value="">Select Type</option>
+                        <option value="basic_cleaning">Basic Cleaning</option>
+                        <option value="deep_cleaning">Deep Cleaning</option>
+                        <option value="chemical_wash">Chemical Wash</option>
+                        <option value="coil_cleaning">Coil Cleaning</option>
+                        <option value="filter_cleaning">Filter Cleaning</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="base_price" class="form-control" placeholder="Base Price" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-1">
+                    <select name="unit_type" class="form-control" required>
+                        <option value="per_unit">Per Unit</option>
+                        <option value="per_hour">Per Hour</option>
+                        <option value="per_service">Per Service</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary w-100">Add</button>
+                </div>
+                <div class="col-md-12">
+                    <select name="aircon_type" class="form-control" required>
+                        <option value="all">All Types</option>
+                        <option value="window">Window</option>
+                        <option value="split">Split</option>
+                        <option value="cassette">Cassette</option>
+                        <option value="floor_standing">Floor Standing</option>
+                    </select>
                 </div>
             </form>
         </div>
@@ -158,41 +190,47 @@ require_once 'includes/header.php';
 
     <div class="card">
         <div class="card-body">
-            <h6 class="mb-3">Existing Aircon Models</h6>
+            <h6 class="mb-3">Existing Cleaning Services</h6>
             <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm align-middle mb-0">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Brand</th>
-                            <th>Model Name</th>
-                            <th>Price</th>
+                            <th>Service Name</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Base Price</th>
+                            <th>Unit Type</th>
+                            <th>Aircon Type</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (count($airconModels)): ?>
-                            <?php foreach ($airconModels as $model): ?>
+                        <?php if (count($cleaningServices)): ?>
+                            <?php foreach ($cleaningServices as $service): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($model['id']) ?></td>
-                                    <td><?= htmlspecialchars($model['brand']) ?></td>
-                                    <td><?= htmlspecialchars($model['model_name']) ?></td>
-                                    <td><?= htmlspecialchars(number_format($model['price'], 2)) ?></td>
+                                    <td><?= htmlspecialchars($service['id']) ?></td>
+                                    <td><?= htmlspecialchars($service['service_name']) ?></td>
+                                    <td><?= htmlspecialchars($service['service_description']) ?></td>
+                                    <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $service['service_type']))) ?></td>
+                                    <td><?= htmlspecialchars(number_format($service['base_price'], 2)) ?></td>
+                                    <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $service['unit_type']))) ?></td>
+                                    <td><?= htmlspecialchars(ucwords(str_replace('_', ' ', $service['aircon_type']))) ?></td>
                                     <td>
                                         <!-- Edit Button (icon only) -->
-                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal_<?= $model['id'] ?>" title="Edit">
+                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal_<?= $service['id'] ?>" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- Delete Button (icon only) -->
-                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="confirmDelete(<?= $model['id'] ?>)">
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="confirmDelete(<?= $service['id'] ?>)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="5" class="text-center">No aircon models found.</td></tr>
+                            <tr><td colspan="8" class="text-center">No cleaning services found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                     </table>
@@ -200,37 +238,65 @@ require_once 'includes/header.php';
             </div>
             <!-- Delete form (hidden, JS will submit this) -->
             <form id="deleteForm" method="post" style="display:none;">
-                <input type="hidden" name="delete_aircon_model" value="1">
-                <input type="hidden" name="model_id" id="deleteModelId">
+                <input type="hidden" name="delete_cleaning_service" value="1">
+                <input type="hidden" name="service_id" id="deleteServiceId">
             </form>
         </div>
     </div>
 </div>
 
 <!-- All Edit Modals (move outside of table for Bootstrap compatibility) -->
-<?php if (count($airconModels)): ?>
-    <?php foreach ($airconModels as $model): ?>
-        <div class="modal fade" id="editModal_<?= $model['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel_<?= $model['id'] ?>" aria-hidden="true">
+<?php if (count($cleaningServices)): ?>
+    <?php foreach ($cleaningServices as $service): ?>
+        <div class="modal fade" id="editModal_<?= $service['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel_<?= $service['id'] ?>" aria-hidden="true">
             <div class="modal-dialog">
                 <form method="post" class="modal-content">
-                    <input type="hidden" name="edit_aircon_model" value="1">
-                    <input type="hidden" name="model_id" value="<?= $model['id'] ?>">
+                    <input type="hidden" name="edit_cleaning_service" value="1">
+                    <input type="hidden" name="service_id" value="<?= $service['id'] ?>">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel_<?= $model['id'] ?>">Edit Aircon Model</h5>
+                        <h5 class="modal-title" id="editModalLabel_<?= $service['id'] ?>">Edit Cleaning Service</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Brand</label>
-                            <input type="text" name="brand" class="form-control" value="<?= htmlspecialchars($model['brand']) ?>" required>
+                            <label class="form-label">Service Name</label>
+                            <input type="text" name="service_name" class="form-control" value="<?= htmlspecialchars($service['service_name']) ?>" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Model Name</label>
-                            <input type="text" name="model_name" class="form-control" value="<?= htmlspecialchars($model['model_name']) ?>" required>
+                            <label class="form-label">Service Description</label>
+                            <textarea name="service_description" class="form-control" rows="3" required><?= htmlspecialchars($service['service_description']) ?></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" name="price" class="form-control" value="<?= htmlspecialchars($model['price']) ?>" step="0.01" min="0" required>
+                            <label class="form-label">Service Type</label>
+                            <select name="service_type" class="form-control" required>
+                                <option value="basic_cleaning" <?= $service['service_type'] === 'basic_cleaning' ? 'selected' : '' ?>>Basic Cleaning</option>
+                                <option value="deep_cleaning" <?= $service['service_type'] === 'deep_cleaning' ? 'selected' : '' ?>>Deep Cleaning</option>
+                                <option value="chemical_wash" <?= $service['service_type'] === 'chemical_wash' ? 'selected' : '' ?>>Chemical Wash</option>
+                                <option value="coil_cleaning" <?= $service['service_type'] === 'coil_cleaning' ? 'selected' : '' ?>>Coil Cleaning</option>
+                                <option value="filter_cleaning" <?= $service['service_type'] === 'filter_cleaning' ? 'selected' : '' ?>>Filter Cleaning</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Base Price</label>
+                            <input type="number" name="base_price" class="form-control" value="<?= htmlspecialchars($service['base_price']) ?>" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Unit Type</label>
+                            <select name="unit_type" class="form-control" required>
+                                <option value="per_unit" <?= $service['unit_type'] === 'per_unit' ? 'selected' : '' ?>>Per Unit</option>
+                                <option value="per_hour" <?= $service['unit_type'] === 'per_hour' ? 'selected' : '' ?>>Per Hour</option>
+                                <option value="per_service" <?= $service['unit_type'] === 'per_service' ? 'selected' : '' ?>>Per Service</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Aircon Type</label>
+                            <select name="aircon_type" class="form-control" required>
+                                <option value="all" <?= $service['aircon_type'] === 'all' ? 'selected' : '' ?>>All Types</option>
+                                <option value="window" <?= $service['aircon_type'] === 'window' ? 'selected' : '' ?>>Window</option>
+                                <option value="split" <?= $service['aircon_type'] === 'split' ? 'selected' : '' ?>>Split</option>
+                                <option value="cassette" <?= $service['aircon_type'] === 'cassette' ? 'selected' : '' ?>>Cassette</option>
+                                <option value="floor_standing" <?= $service['aircon_type'] === 'floor_standing' ? 'selected' : '' ?>>Floor Standing</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -255,8 +321,8 @@ require_once 'includes/header.php';
         })
 
         function confirmDelete(id) {
-            if (confirm('Are you sure you want to delete this model?')) {
-                document.getElementById('deleteModelId').value = id;
+            if (confirm('Are you sure you want to delete this service?')) {
+                document.getElementById('deleteServiceId').value = id;
                 document.getElementById('deleteForm').submit();
             }
         }

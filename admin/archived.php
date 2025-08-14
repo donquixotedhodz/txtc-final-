@@ -611,7 +611,30 @@ require_once 'includes/header.php';
                                 
                                 // Populate service information
                                 document.getElementById('view_service_type').textContent = order.service_type ? order.service_type.charAt(0).toUpperCase() + order.service_type.slice(1) : '-';
-                                document.getElementById('view_aircon_model').textContent = order.model_name || 'Not Specified';
+                                
+                                // Show/hide sections based on service type
+                                if (order.service_type === 'repair') {
+                                    // Hide aircon model section and show parts information
+                                    document.getElementById('view_aircon_model_section').style.display = 'none';
+                                    document.getElementById('view_part_info_section').style.display = 'block';
+                                    document.getElementById('view_part_code_section').style.display = 'block';
+                                    document.getElementById('view_part_category_section').style.display = 'block';
+                                    
+                                    // Populate parts information
+                                    document.getElementById('view_part_name').textContent = order.part_name || 'Not Specified';
+                                    document.getElementById('view_part_code').textContent = order.part_code || 'Not Specified';
+                                    document.getElementById('view_part_category').textContent = order.part_category ? order.part_category.charAt(0).toUpperCase() + order.part_category.slice(1) : 'Not Specified';
+                                } else {
+                                    // Show aircon model section and hide parts information
+                                    document.getElementById('view_aircon_model_section').style.display = 'block';
+                                    document.getElementById('view_part_info_section').style.display = 'none';
+                                    document.getElementById('view_part_code_section').style.display = 'none';
+                                    document.getElementById('view_part_category_section').style.display = 'none';
+                                    
+                                    // Populate aircon model information
+                                    document.getElementById('view_aircon_model').textContent = order.model_name || 'Not Specified';
+                                }
+                                
                                 document.getElementById('view_job_order_number').textContent = order.job_order_number || '-';
                                 
                                 // Populate status information

@@ -64,30 +64,37 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
             </ul>
         </li>
-        <li>
-            <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'active' : '' ?>">
+        <li class="<?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php', 'cleaning_services.php']) ? 'active' : '' ?>">
+            <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php', 'cleaning_services.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php', 'cleaning_services.php']) ? 'active' : '' ?>">
                 <i class="fas fa-cog"></i>
                 Settings
             </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php']) ? 'show' : '' ?>" id="settingsSubmenu">
-                <li>
+            <ul class="collapse list-unstyled <?= in_array($current_page, ['index.php', 'settings/index.php', 'aircon_models.php', 'estimation.php', 'cleaning_services.php']) ? 'show' : '' ?>" id="settingsSubmenu">
+                <li class="<?= $current_page === 'index.php' || $current_page === 'settings/index.php' ? 'active' : '' ?>">
                     <a href="../settings/index.php" class="<?= $current_page === 'index.php' || $current_page === 'settings/index.php' ? 'active' : '' ?>">
                         <i class="fas fa-user-shield"></i>
                         Account Settings
                     </a>
                 </li>
-                <li>
+                <li class="<?= $current_page === 'aircon_models.php' ? 'active' : '' ?>">
                     <a href="../aircon_models.php" class="<?= $current_page === 'aircon_models.php' ? 'active' : '' ?>">
                         <i class="fas fa-snowflake"></i>
                         Aircon Models
                     </a>
                 </li>
-                     <li>
-                    <a href="../view/estimation.php" class="<?= $current_page === 'estimation.php' || $current_page === 'view/estimation.php' ? 'active' : '' ?>">
-                            <i class="fas fa-calculator"></i>
-                            Services
-                        </a>
+                <li class="<?= $current_page === 'cleaning_services.php' ? 'active' : '' ?>">
+                    <a href="../cleaning_services.php" class="<?= $current_page === 'cleaning_services.php' ? 'active' : '' ?>">
+                        <i class="fas fa-broom"></i>
+                        Cleaning Services
+                    </a>
                 </li>
+                <li class="<?= $current_page === 'estimation.php' || $current_page === 'view/estimation.php' ? 'active' : '' ?>">
+                    <a href="../view/estimation.php" class="<?= $current_page === 'estimation.php' || $current_page === 'view/estimation.php' ? 'active' : '' ?>">
+                        <i class="fas fa-calculator"></i>
+                        Parts
+                    </a>
+                </li>
+                
             </ul>
         </li>
     </ul>

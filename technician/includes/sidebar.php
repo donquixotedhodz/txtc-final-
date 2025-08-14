@@ -43,19 +43,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 Profile
             </a>
         </li>
-        <li>
+        <li class="<?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'active' : '' ?>">
             <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'active' : '' ?>">
                 <i class="fas fa-chart-bar"></i>
                 Reports
             </a>
             <ul class="collapse list-unstyled <?= in_array($current_page, ['reports.php', 'sales_report.php']) ? 'show' : '' ?>" id="reportsSubmenu">
-                <li>
+                <li class="<?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
                     <a href="sales_report.php" class="<?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
                         <i class="fas fa-coins"></i>
                         Sales Report
                     </a>
                 </li>
-                <li>
+                <li class="<?= $current_page === 'reports.php' ? 'active' : '' ?>">
                     <a href="reports.php" class="<?= $current_page === 'reports.php' ? 'active' : '' ?>">
                         <i class="fas fa-clipboard-list"></i>
                         My Job Orders
@@ -63,19 +63,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
             </ul>
         </li>
-        <li>
+        <li class="<?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'estimation_builder.php']) ? 'active' : '' ?>">
             <a href="#servicesSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'estimation_builder.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'estimation_builder.php']) ? 'active' : '' ?>">
                 <i class="fas fa-tools"></i>
                 Services
             </a>
             <ul class="collapse list-unstyled <?= in_array($current_page ?? '', ['aircon_brands.php', 'repair.php', 'visual_estimation.php', 'estimation_builder.php']) ? 'show' : '' ?>" id="servicesSubmenu">
-                <li>
+                <li class="<?= ($current_page ?? '') === 'aircon_brands.php' ? 'active' : '' ?>">
                     <a href="aircon_brands.php" class="<?= ($current_page ?? '') === 'aircon_brands.php' ? 'active' : '' ?>">
                         <i class="fas fa-snowflake"></i>
                         Aircon Brands
                     </a>
                 </li>
-                <li>
+                <li class="<?= ($current_page ?? '') === 'estimation_builder.php' ? 'active' : '' ?>">
                     <a href="estimation_builder.php" class="<?= ($current_page ?? '') === 'estimation_builder.php' ? 'active' : '' ?>">
                         <i class="fas fa-calculator"></i>
                         Estimation Builder

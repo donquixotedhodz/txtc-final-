@@ -127,125 +127,137 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                 <!-- Header -->
-                 <div class="d-flex justify-content-between align-items-center mb-4">
-                     <div>
-                         <h4 class="mb-0"><i class="fas fa-calculator me-2"></i>Estimation Database</h4>
-                         <p class="text-muted mb-0">Manage air conditioning repair estimates, cleaning services, and parts pricing</p>
-                     </div>
-                     <div class="d-flex gap-2">
-                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-                             <i class="fas fa-plus me-2"></i>Add New Item
-                         </button>
-                     </div>
-                 </div>
+<div class="container mt-4">
+    <h3>Parts Management</h3>
+    <p class="text-muted mb-4">Manage air conditioning repair estimates, cleaning services, and parts pricing</p>
 
-                <!-- Alert Messages -->
-                <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?= $_SESSION['success_message'] ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?></div>
+    <?php endif; ?>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Add New AC Part</h5>
+            <form id="addPartFormDirect" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="part_name" class="form-control" placeholder="Part Name" required>
                 </div>
-                <?php unset($_SESSION['success_message']); endif; ?>
-
-                <?php if (isset($_SESSION['error_message'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= $_SESSION['error_message'] ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="col-md-2">
+                    <input type="text" name="part_code" class="form-control" placeholder="Part Code">
                 </div>
-                <?php unset($_SESSION['error_message']); endif; ?>
+                <div class="col-md-2">
+                    <select name="part_category" class="form-select" required>
+                        <option value="">Category</option>
+                        <option value="compressor">Compressor</option>
+                        <option value="condenser">Condenser</option>
+                        <option value="evaporator">Evaporator</option>
+                        <option value="filter">Filter</option>
+                        <option value="capacitor">Capacitor</option>
+                        <option value="thermostat">Thermostat</option>
+                        <option value="fan_motor">Fan Motor</option>
+                        <option value="refrigerant">Refrigerant</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="unit_price" class="form-control" placeholder="Unit Price" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="labor_cost" class="form-control" placeholder="Labor Cost" step="0.01" min="0">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- Filter Section -->
-                 <div class="card shadow-sm mb-4">
-                     <div class="card-header bg-light">
-                         <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Options</h6>
-                     </div>
-                     <div class="card-body">
-                         <form method="GET" class="row g-3">
-                             <div class="col-md-4">
-                            <label class="form-label fw-semibold">Part Category</label>
-                            <select name="part_category" class="form-select">
-                                <option value="">All Parts</option>
-                                <option value="compressor" <?= $part_category == 'compressor' ? 'selected' : '' ?>>Compressor</option>
-                                <option value="condenser" <?= $part_category == 'condenser' ? 'selected' : '' ?>>Condenser</option>
-                                <option value="evaporator" <?= $part_category == 'evaporator' ? 'selected' : '' ?>>Evaporator</option>
-                                <option value="filter" <?= $part_category == 'filter' ? 'selected' : '' ?>>Filter</option>
-                                <option value="capacitor" <?= $part_category == 'capacitor' ? 'selected' : '' ?>>Capacitor</option>
-                                <option value="thermostat" <?= $part_category == 'thermostat' ? 'selected' : '' ?>>Thermostat</option>
-                                <option value="fan_motor" <?= $part_category == 'fan_motor' ? 'selected' : '' ?>>Fan Motor</option>
-                                <option value="refrigerant" <?= $part_category == 'refrigerant' ? 'selected' : '' ?>>Refrigerant</option>
-                                <option value="electrical" <?= $part_category == 'electrical' ? 'selected' : '' ?>>Electrical</option>
-                                <option value="other" <?= $part_category == 'other' ? 'selected' : '' ?>>Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">&nbsp;</label>
-                            <div>
-                                <button type="submit" class="btn btn-primary me-2">
-                                    <i class="fas fa-filter me-1"></i>Filter
-                                </button>
-                                <a href="estimation.php" class="btn btn-outline-secondary">
-                                    <i class="fas fa-times me-1"></i>Clear
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Filter Options</h5>
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <select name="part_category" class="form-select">
+                        <option value="">All Parts</option>
+                        <option value="compressor" <?= $part_category == 'compressor' ? 'selected' : '' ?>>Compressor</option>
+                        <option value="condenser" <?= $part_category == 'condenser' ? 'selected' : '' ?>>Condenser</option>
+                        <option value="evaporator" <?= $part_category == 'evaporator' ? 'selected' : '' ?>>Evaporator</option>
+                        <option value="filter" <?= $part_category == 'filter' ? 'selected' : '' ?>>Filter</option>
+                        <option value="capacitor" <?= $part_category == 'capacitor' ? 'selected' : '' ?>>Capacitor</option>
+                        <option value="thermostat" <?= $part_category == 'thermostat' ? 'selected' : '' ?>>Thermostat</option>
+                        <option value="fan_motor" <?= $part_category == 'fan_motor' ? 'selected' : '' ?>>Fan Motor</option>
+                        <option value="refrigerant" <?= $part_category == 'refrigerant' ? 'selected' : '' ?>>Refrigerant</option>
+                        <option value="electrical" <?= $part_category == 'electrical' ? 'selected' : '' ?>>Electrical</option>
+                        <option value="other" <?= $part_category == 'other' ? 'selected' : '' ?>>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="estimation.php" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h6 class="mb-3">AC Parts & Prices (<?= count($parts) ?>)</h6>
+            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Part Name</th>
+                                <th>Code</th>
+                                <th>Category</th>
+                                <th>Unit Price</th>
+                                <th>Labor Cost</th>
+                                <th>Total Cost</th>
+                                <th>Warranty</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (count($parts)): ?>
+                                <?php foreach ($parts as $part): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($part['part_name']) ?></td>
+                                    <td><?= htmlspecialchars($part['part_code']) ?></td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            <?= str_replace('_', ' ', ucfirst($part['part_category'])) ?>
+                                        </span>
+                                    </td>
+                                    <td>₱<?= number_format($part['unit_price'], 2) ?></td>
+                                    <td>₱<?= number_format($part['labor_cost'], 2) ?></td>
+                                    <td><strong>₱<?= number_format($part['unit_price'] + $part['labor_cost'], 2) ?></strong></td>
+                                    <td><?= $part['warranty_months'] ?> months</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-warning" onclick="editPart(<?= $part['id'] ?>)" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deletePart(<?= $part['id'] ?>, '<?= htmlspecialchars($part['part_name'], ENT_QUOTES) ?>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="8" class="text-center">No parts found.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-                <!-- Tabs -->
-                 <div class="card shadow-sm">
-                     <div class="card-header bg-primary text-white">
-                         <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>AC Parts & Prices (<?= count($parts) ?>)</h5>
-                     </div>
-
-                    <!-- Parts Content -->
-                    <div class="card-body">
-                            <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>Part Name</th>
-                                                <th>Code</th>
-                                                <th>Category</th>
-                                                <th>Unit Price</th>
-                                                <th>Labor Cost</th>
-                                                <th>Total Cost</th>
-                                                <th>Warranty</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($parts as $part): ?>
-                                            <tr>
-                                                <td><strong><?= htmlspecialchars($part['part_name']) ?></strong></td>
-                                                <td><code><?= htmlspecialchars($part['part_code']) ?></code></td>
-                                                <td>
-                                                    <span class="badge bg-secondary badge-category">
-                                                        <?= str_replace('_', ' ', ucfirst($part['part_category'])) ?>
-                                                    </span>
-                                                </td>
-                                                <td class="price-highlight">₱<?= number_format($part['unit_price'], 2) ?></td>
-                                                <td>₱<?= number_format($part['labor_cost'], 2) ?></td>
-                                                <td class="price-highlight"><strong>₱<?= number_format($part['unit_price'] + $part['labor_cost'], 2) ?></strong></td>
-                                                <td><?= $part['warranty_months'] ?> months</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editPart(<?= $part['id'] ?>)">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="deletePart(<?= $part['id'] ?>, '<?= htmlspecialchars($part['part_name'], ENT_QUOTES) ?>')">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -411,7 +423,35 @@ require_once 'includes/header.php';
             });
         });
 
-        // Handle add form submission
+        // Handle direct add form submission
+        document.getElementById('addPartFormDirect').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('action', 'create');
+            formData.append('type', 'part');
+            formData.append('warranty_months', '12'); // Default warranty
+            
+            fetch('../controller/unified_estimation_controller.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reset form and reload page
+                    this.reset();
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error adding part');
+                console.error('Error:', error);
+            });
+        });
+
+        // Handle modal add form submission (keep for backward compatibility)
         document.getElementById('addPartForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
