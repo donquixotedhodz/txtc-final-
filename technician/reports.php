@@ -134,17 +134,20 @@ require_once 'includes/header.php';
                         <img src="../images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
                     </div>
                     <div class="text-end">
-                        <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">My Job Orders Report</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Job Orders Report</div>
                         <div style="font-size: 12px; color: #7f8c8d;">Technician: <?= htmlspecialchars($technician['name'] ?: 'Technician') ?></div>
                         <div style="font-size: 12px; color: #7f8c8d;">Date Generated: <?= date('F j, Y \a\t g:i A') ?></div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Report Title -->
+            <div class="print-report-title" style="display: none;">Job Orders Report</div>
 
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h3 class="mb-3">My Job Orders Report</h3>
+                    <h3 class="mb-3">Job Orders Report</h3>
                 <p class="text-muted mb-4">All your assigned job orders including cancelled, with filters and pagination.</p>
                 </div>
                 <button class="btn btn-success" onclick="window.print()">
@@ -346,10 +349,6 @@ require_once 'includes/header.php';
                             <span style="font-weight: bold; color: #3498db;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'installation'; })) ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <span style="font-weight: 600;">Maintenance Orders:</span>
-                            <span style="font-weight: bold; color: #27ae60;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'maintenance'; })) ?></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
                             <span style="font-weight: 600;">Survey Orders:</span>
                             <span style="font-weight: bold; color: #17a2b8;"><?= count(array_filter($orders, function($order) { return $order['service_type'] == 'survey'; })) ?></span>
                         </div>
@@ -397,136 +396,220 @@ function printJobOrdersReport() {
 
 /* Table font size for print */
 @media print {
-    .table {
-        font-size: 14px !important;
-    }
-    .table th {
-        font-size: 16px !important;
-    }
     /* Hide screen elements */
-    .navbar, .sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse,
+    .navbar, .sidebar, #sidebar, .wrapper > #sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse, #content nav,
     .row.mb-4, /* This hides the summary cards row */
     .card.text-bg-primary, .card.text-bg-info, .card.text-bg-success /* Extra safety for summary cards */
     {
         display: none !important;
     }
+    
+    /* Hide wrapper sidebar structure */
+    .wrapper {
+        display: block !important;
+    }
+    
+    #content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Hide main page title and description from print */
+    h3, h5, .text-muted {
+        display: none !important;
+    }
 
+    /* Reset page layout for clean print */
+    body {
+        margin: 0 !important;
+        padding: 10px !important;
+        font-family: 'Arial', sans-serif !important;
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+        color: #000 !important;
+        background: white !important;
+    }
+
+    /* Container adjustments */
+    .container, .container-fluid {
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Card styling - remove all design elements */
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    
+    .card-body {
+        padding: 0 !important;
+    }
+
+    /* Print header with logo and admin info */
+    body::before {
+        content: "";
+        display: none;
+    }
+    
     /* Show print header */
     .print-header {
         display: block !important;
         margin-bottom: 30px !important;
         padding-bottom: 20px !important;
-        border-bottom: 2px solid #34495e !important;
         page-break-after: avoid !important;
     }
-
+    
     .print-header img {
         display: block !important;
         max-height: 60px !important;
         width: auto !important;
     }
-
+    
     .print-header .text-end {
         text-align: right !important;
     }
-
-    /* Reset page layout */
-    body {
-        margin: 0 !important;
-        padding: 20px !important;
-        font-family: 'Arial', sans-serif !important;
-        font-size: 12px !important;
-        line-height: 1.4 !important;
-        color: #000 !important;
-        background: white !important;
+    
+    /* Job Orders Report title on left */
+    .print-report-title {
+        display: block !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        color: #2c3e50 !important;
+        margin-bottom: 15px !important;
+        text-align: left !important;
     }
 
-    /* Header styling */
-    .container-fluid {
-        max-width: none !important;
-        padding: 0 !important;
+    /* Table styling for clean print */
+    .table-responsive {
+        overflow: visible !important;
     }
-
-    /* Table styling for print */
+    
+    .table-wrapper {
+        max-height: none !important;
+        overflow: visible !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+    
     .table {
         width: 100% !important;
         border-collapse: collapse !important;
         margin-bottom: 20px !important;
-        font-size: 11px !important;
+        font-size: 8px !important;
+        table-layout: fixed !important;
     }
 
     .table th {
-        background: #34495e !important;
-        color: white !important;
+         background: #fff !important;
+         color: #000 !important;
+         font-weight: bold !important;
+         text-align: center !important;
+         padding: 6px 3px !important;
+         border: 1px solid #000 !important;
+         font-size: 9px !important;
+         word-wrap: break-word !important;
+     }
+
+     .table td {
+         padding: 4px 3px !important;
+         border: 1px solid #000 !important;
+         vertical-align: top !important;
+         word-wrap: break-word !important;
+         text-align: center !important;
+         font-size: 8px !important;
+         color: #000 !important;
+         background: #fff !important;
+     }
+
+    /* Optimized column widths for technician job orders report */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 8% !important; } /* Order # */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 12% !important; } /* Customer */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 10% !important; } /* Service Type */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 10% !important; } /* Brand */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 12% !important; } /* Model */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 10% !important; } /* Part Code */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 12% !important; } /* Part Name */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 8% !important; } /* Price */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 8% !important; } /* Status */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 10% !important; } /* Created At */
+
+    .table tbody tr {
+         background: #fff !important;
+     }
+
+    /* Badge styling for print */
+    .badge {
+        background: #000 !important;
+        color: #000 !important;
+        padding: 1px 3px !important;
+        border-radius: 2px !important;
+        font-size: 7px !important;
         font-weight: bold !important;
-        text-align: left !important;
-        padding: 12px 8px !important;
         border: none !important;
-        font-size: 12px !important;
     }
+    
+    /* Specific badge colors for print - all black */
+    .bg-primary { background: #000 !important; color: #000 !important; }
+    .bg-warning { background: #000 !important; color: #000 !important; }
+    .bg-success { background: #000 !important; color: #000 !important; }
+    .bg-info { background: #000 !important; color: #000 !important; }
+    .bg-secondary { background: #000 !important; color: #000 !important; }
+    .bg-danger { background: #000 !important; color: #000 !important; }
 
-    .table td {
-        padding: 10px 8px !important;
-        border: none !important;
-        vertical-align: top !important;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background: #f8f9fa !important;
-    }
-
-    /* Hide action columns in print if any */
-    .table th:last-child,
-    .table td:last-child {
-        display: none !important;
-    }
-
-    /* Print summary styling */
+    /* Print summary styling - positioned on left */
     .print-summary {
         display: block !important;
-        margin-top: 30px !important;
-        padding-top: 20px !important;
+        margin-top: 20px !important;
+        padding-top: 15px !important;
         border-top: 2px solid #34495e !important;
         page-break-inside: avoid !important;
+        width: 50% !important;
+        float: left !important;
     }
 
     .print-summary h5 {
         color: #2c3e50 !important;
         font-weight: bold !important;
-        font-size: 14px !important;
-        margin-bottom: 15px !important;
+        font-size: 12px !important;
+        margin-bottom: 10px !important;
+        text-align: left !important;
     }
 
     .print-summary .d-flex {
         display: flex !important;
         justify-content: space-between !important;
-        margin-bottom: 8px !important;
-        padding: 5px 0 !important;
+        margin-bottom: 5px !important;
+        padding: 3px 0 !important;
     }
 
     .print-summary span {
-        font-size: 12px !important;
+        font-size: 10px !important;
     }
 
     .print-summary span[style*="font-weight: bold"] {
         font-weight: bold !important;
     }
 
-    .print-summary span[style*="color: #27ae60"] {
-        color: #27ae60 !important;
+    /* Ensure table doesn't break across pages */
+    .table {
+        page-break-inside: auto !important;
     }
-
-    .print-summary span[style*="color: #3498db"] {
-        color: #3498db !important;
+    
+    .table tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
     }
-
-    .print-summary span[style*="color: #e74c3c"] {
-        color: #e74c3c !important;
-        font-size: 13px !important;
+    
+    .table thead {
+        display: table-header-group !important;
     }
-
-    .print-summary span[style*="color: #9b59b6"] {
-        color: #9b59b6 !important;
+    
+    /* Hide empty cells cleanly */
+    .text-muted {
+        color: #999 !important;
     }
 }
 </style>

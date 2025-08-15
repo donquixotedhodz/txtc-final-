@@ -98,22 +98,21 @@ require_once 'includes/header.php';
         </nav>
             <div class="container mt-4">
             <!-- Print Header (hidden by default, shown only when printing) -->
-            <div class="print-header" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <img src="../images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
-                    </div>
-                    <div class="text-end">
-                        <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Sales Report</div>
-                        <div style="font-size: 12px; color: #7f8c8d;">Technician: <?= htmlspecialchars($technician['name'] ?: 'Technician') ?></div>
-                        <div style="font-size: 12px; color: #7f8c8d;">Date Generated: <?= date('F j, Y \a\t g:i A') ?></div>
-                    </div>
+            <div class="print-header-custom" style="display: none;">
+                <img src="../images/logo.png" alt="Company Logo" class="print-logo">
+                <div class="print-admin-info">
+                    <div><strong>Technician:</strong> <?= htmlspecialchars($technician['name'] ?? 'Technician') ?></div>
+                    <div><strong>Date:</strong> <?= date('F j, Y \a\t g:i A') ?></div>
                 </div>
             </div>
+            
+            <!-- Report Title for Print -->
+            <div class="print-report-title" style="display: none;">Sales Report</div>
+                <h3>Sales Report</h3>
+                
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h3 class="mb-3">Sales Report</h3>
-                        <p class="text-muted mb-4">View and print all completed sales with filters.</p>
+                        <p class="text-muted mb-0">View and print all completed sales with filters</p>
                     </div>
                     <button class="btn btn-success" onclick="window.print()">
                         <i class="fas fa-print"></i> Print
@@ -224,12 +223,8 @@ require_once 'includes/header.php';
                         <div class="summary-item">
                             <h5 class="mb-2" style="color: #2c3e50; font-weight: bold;">Summary</h5>
                             <div class="d-flex justify-content-between mb-2">
-                                <span style="font-weight: 600;">Number of Transactions:</span>
+                                <span style="font-weight: 600;">Number of Aircons Sold:</span>
                                 <span style="font-weight: bold; color: #27ae60;"><?= count($sales) ?></span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span style="font-weight: 600;">Average Sale:</span>
-                                <span style="font-weight: bold; color: #3498db;">₱<?= number_format(count($sales) > 0 ? $total_sales / count($sales) : 0, 2) ?></span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span style="font-weight: 600;">Total Sales Amount:</span>
@@ -260,134 +255,209 @@ require_once 'includes/header.php';
             font-size: 14px !important;
         }
 
-        /* Table font size for print */
         @media print {
-            .table {
-                font-size: 14px !important;
-            }
-            .table th {
-                font-size: 16px !important;
-            }
             /* Hide screen elements */
-            .navbar, .sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse,
+            .navbar, .sidebar, #sidebar, .wrapper > #sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse, #content nav,
             .row.mb-4, /* This hides the summary cards row */
             .card.text-bg-primary, .card.text-bg-info, .card.text-bg-success, .card.bg-primary, .card.bg-success, .card.bg-info /* Extra safety for summary cards */
             {
                 display: none !important;
             }
-
-            /* Show print header */
-            .print-header {
+            
+            /* Hide wrapper sidebar structure */
+            .wrapper {
                 display: block !important;
-                margin-bottom: 30px !important;
-                padding-bottom: 20px !important;
-                border-bottom: 2px solid #34495e !important;
-                page-break-after: avoid !important;
+            }
+            
+            #content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            
+            /* Hide main page title from print */
+            h3, h5 {
+                display: none !important;
             }
 
-            .print-header img {
-                display: block !important;
-                max-height: 60px !important;
-                width: auto !important;
-            }
-
-            .print-header .text-end {
-                text-align: right !important;
-            }
-
-            /* Reset page layout */
+            /* Reset page layout for clean print */
             body {
                 margin: 0 !important;
-                padding: 20px !important;
+                padding: 10px !important;
                 font-family: 'Arial', sans-serif !important;
-                font-size: 12px !important;
-                line-height: 1.4 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
                 color: #000 !important;
                 background: white !important;
             }
 
-            /* Header styling */
-            .container-fluid {
+            /* Container adjustments */
+            .container, .container-fluid {
                 max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Card styling - remove all design elements */
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .card-body {
                 padding: 0 !important;
             }
 
-            /* Table styling for print */
+            /* Print header with logo and admin info */
+            body::before {
+                content: "";
+                display: none;
+            }
+            
+            /* Print header content */
+             .print-header-custom {
+                 display: flex !important;
+                 justify-content: space-between !important;
+                 align-items: center !important;
+                 padding: 15px 0 !important;
+                 margin-bottom: 20px !important;
+             }
+            
+            .print-logo {
+                 display: block !important;
+                 max-height: 80px !important;
+                 width: auto !important;
+                 margin-top: 0 !important;
+             }
+            
+            .print-admin-info {
+                text-align: right !important;
+                font-size: 10px !important;
+                line-height: 1.3 !important;
+            }
+            
+            .print-admin-info strong {
+                font-size: 11px !important;
+            }
+            
+            /* Sales Report title on left */
+            .print-report-title {
+                display: block !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                color: #000 !important;
+                margin-bottom: 15px !important;
+                text-align: left !important;
+            }
+
+            /* Table styling for clean print */
+            .table-responsive {
+                overflow: visible !important;
+            }
+            
+            .table-wrapper {
+                max-height: none !important;
+                overflow: visible !important;
+                border: none !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+            }
+            
             .table {
                 width: 100% !important;
                 border-collapse: collapse !important;
                 margin-bottom: 20px !important;
-                font-size: 11px !important;
+                font-size: 8px !important;
+                table-layout: fixed !important;
+                background: transparent !important;
             }
 
             .table th {
-                background: #34495e !important;
-                color: white !important;
-                font-weight: bold !important;
-                text-align: left !important;
-                padding: 12px 8px !important;
-                border: none !important;
-                font-size: 12px !important;
-            }
+                 background: transparent !important;
+                 color: #000 !important;
+                 font-weight: bold !important;
+                 text-align: center !important;
+                 padding: 6px 3px !important;
+                 border: 1px solid #000 !important;
+                 font-size: 9px !important;
+                 word-wrap: break-word !important;
+             }
 
-            .table td {
-                padding: 10px 8px !important;
-                border: none !important;
-                vertical-align: top !important;
-            }
+             .table td {
+                 padding: 4px 3px !important;
+                 border: 1px solid #000 !important;
+                 vertical-align: top !important;
+                 word-wrap: break-word !important;
+                 text-align: center !important;
+                 font-size: 8px !important;
+                 color: #000 !important;
+                 background: transparent !important;
+             }
+
+            /* Optimized column widths for sales report */
+            .table th:nth-child(1), .table td:nth-child(1) { width: 25% !important; }  /* Order # */
+            .table th:nth-child(2), .table td:nth-child(2) { width: 35% !important; } /* Customer */
+            .table th:nth-child(3), .table td:nth-child(3) { width: 20% !important; }  /* Price */
+            .table th:nth-child(4), .table td:nth-child(4) { width: 20% !important; }  /* Completed At */
 
             .table tbody tr:nth-child(even) {
-                background: #f8f9fa !important;
-            }
+                 background: transparent !important;
+             }
+             
+             .table tbody tr {
+                 background: transparent !important;
+             }
 
-            /* Hide action columns in print if any */
-            .table th:last-child,
-            .table td:last-child {
-                display: none !important;
-            }
-
-            /* Print summary styling */
+            /* Print summary styling - positioned on left */
             .print-summary {
                 display: block !important;
-                margin-top: 30px !important;
-                padding-top: 20px !important;
-                border-top: 2px solid #34495e !important;
+                margin-top: 20px !important;
+                padding-top: 15px !important;
                 page-break-inside: avoid !important;
+                width: 50% !important;
+                float: left !important;
             }
 
             .print-summary h5 {
-                color: #2c3e50 !important;
+                color: #000 !important;
                 font-weight: bold !important;
-                font-size: 14px !important;
-                margin-bottom: 15px !important;
+                font-size: 12px !important;
+                margin-bottom: 10px !important;
+                text-align: left !important;
             }
 
             .print-summary .d-flex {
                 display: flex !important;
                 justify-content: space-between !important;
-                margin-bottom: 8px !important;
-                padding: 5px 0 !important;
+                margin-bottom: 5px !important;
+                padding: 3px 0 !important;
             }
 
             .print-summary span {
-                font-size: 12px !important;
+                font-size: 10px !important;
             }
 
             .print-summary span[style*="font-weight: bold"] {
                 font-weight: bold !important;
             }
 
-            .print-summary span[style*="color: #27ae60"] {
-                color: #27ae60 !important;
+            /* Ensure table doesn't break across pages */
+            .table {
+                page-break-inside: auto !important;
             }
-
-            .print-summary span[style*="color: #3498db"] {
-                color: #3498db !important;
+            
+            .table tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
             }
-
-            .print-summary span[style*="color: #e74c3c"] {
-                color: #e74c3c !important;
-                font-size: 13px !important;
+            
+            .table thead {
+                display: table-header-group !important;
+            }
+            
+            /* Hide empty cells cleanly */
+            .text-muted {
+                color: #999 !important;
             }
         }
     </style>
