@@ -118,7 +118,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -136,70 +136,63 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <!-- Print Header (hidden by default, shown only when printing) -->
-                <div class="print-header" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
-                        </div>
-                        <div class="text-end">
-                            <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
-                            <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
-                        </div>
-                    </div>
+<div class="container mt-4">
+    <h3>Archived Orders</h3>
+    
+    <!-- Print Header (hidden by default, shown only when printing) -->
+    <div class="print-header" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
+            </div>
+            <div class="text-end">
+                <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
+                <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <p class="text-muted mb-0">View completed and cancelled job orders</p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Filter Archived Orders</h5>
+            <form method="GET" action="" class="row g-3">
+                <div class="col-md-3">
+                    <label for="search_customer" class="form-label">Search Customer</label>
+                    <input type="text" class="form-control" id="search_customer" name="search_customer" value="<?= htmlspecialchars($search_customer) ?>" placeholder="Enter customer name">
                 </div>
-
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0">Archived Orders</h4>
-                        <p class="text-muted mb-0">View completed and cancelled job orders</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary" onclick="window.print()">
-                            <i class="fas fa-print me-2"></i>Print
-                        </button>
-                        <button type="button" class="btn btn-outline-primary">
-                            <i class="fas fa-file-export me-2"></i>Export
-                        </button>
-                    </div>
+                <div class="col-md-3">
+                    <label for="filter_service" class="form-label">Service Type</label>
+                    <select class="form-select" id="filter_service" name="filter_service">
+                        <option value="">All Service Types</option>
+                        <option value="installation" <?= $filter_service === 'installation' ? 'selected' : '' ?>>Installation</option>
+                        <option value="repair" <?= $filter_service === 'repair' ? 'selected' : '' ?>>Repair</option>
+                    </select>
                 </div>
+                <div class="col-md-3">
+                    <label for="filter_technician" class="form-label">Technician</label>
+                    <select class="form-select" id="filter_technician" name="filter_technician">
+                        <option value="">All Technicians</option>
+                        <?php foreach ($technicians as $tech): ?>
+                            <option value="<?= $tech['id'] ?>" <?= (string)$filter_technician === (string)$tech['id'] ? 'selected' : '' ?>><?= htmlspecialchars($tech['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- Search and Filter Form -->
-                <form method="GET" action="" class="mb-4">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <label for="search_customer" class="form-label">Search Customer</label>
-                            <input type="text" class="form-control" id="search_customer" name="search_customer" value="<?= htmlspecialchars($search_customer) ?>" placeholder="Enter customer name">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filter_service" class="form-label">Service Type</label>
-                            <select class="form-select" id="filter_service" name="filter_service">
-                                <option value="">All Service Types</option>
-                                <option value="installation" <?= $filter_service === 'installation' ? 'selected' : '' ?>>Installation</option>
-                                <option value="repair" <?= $filter_service === 'repair' ? 'selected' : '' ?>>Repair</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filter_technician" class="form-label">Technician</label>
-                            <select class="form-select" id="filter_technician" name="filter_technician">
-                                <option value="">All Technicians</option>
-                                <?php foreach ($technicians as $tech): ?>
-                                    <option value="<?= $tech['id'] ?>" <?= (string)$filter_technician === (string)$tech['id'] ? 'selected' : '' ?>><?= htmlspecialchars($tech['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Orders Table -->
-                <div class="card">
+            <!-- Orders Table -->
+            <div class="card mb-4" style="position: relative;">
                     <div class="card-body">
-                        <div class="table-responsive">
+                        <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
@@ -285,17 +278,18 @@ require_once 'includes/header.php';
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+</div>
         </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
     <script>
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

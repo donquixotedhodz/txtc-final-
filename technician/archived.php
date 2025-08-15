@@ -17,8 +17,11 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $technician = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Get search parameter
+    $search_ticket = $_GET['search_ticket'] ?? '';
+
     // Get completed and cancelled orders
-    $stmt = $pdo->prepare("
+    $sql = "
         SELECT 
             jo.*,
             COALESCE(am.model_name, 'Not Specified') as model_name,
@@ -31,14 +34,26 @@ try {
         LEFT JOIN ac_parts ap ON jo.part_id = ap.id
         WHERE jo.assigned_technician_id = ? 
         AND jo.status IN ('completed', 'cancelled')
+    ";
+    
+    $params = [$_SESSION['user_id']];
+    
+    if (!empty($search_ticket)) {
+        $sql .= " AND jo.job_order_number LIKE ?";
+        $params[] = '%' . $search_ticket . '%';
+    }
+    
+    $sql .= "
         ORDER BY 
             CASE 
                 WHEN jo.status = 'completed' THEN 1
                 WHEN jo.status = 'cancelled' THEN 2
             END,
             jo.completed_at DESC
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
+    ";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -124,9 +139,11 @@ try {
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Archived Orders</h1>
+            <div class="container mt-4">
+                <h3>Archived Orders</h3>
+                
+                <div class="mb-4">
+                    <p class="text-muted mb-0">View completed and cancelled job orders</p>
                 </div>
 
                 <?php if (isset($_SESSION['error'])): ?>
@@ -143,16 +160,38 @@ try {
                     </div>
                 <?php endif; ?>
 
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Archived Orders</h5>
+                        </div>
+
+                        <!-- Search Form -->
+                        <form method="GET" action="" class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="search_ticket" class="form-label">Search Ticket Number</label>
+                                <input type="text" class="form-control" id="search_ticket" name="search_ticket" value="<?= htmlspecialchars($_GET['search_ticket'] ?? '') ?>" placeholder="Enter ticket number">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <a href="archived.php" class="btn btn-outline-secondary w-100">Clear Filter</a>
+                            </div>
+                        </form>
+                        
                         <?php if (empty($orders)): ?>
                             <p class="text-muted">No completed orders found.</p>
                         <?php else: ?>
-                            <div class="table-responsive">
+                            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                                <div class="table-responsive">
                                 <table class="table table-hover align-middle">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Order #</th>
+                                            <th>Ticket Number
+                                            </th>
                                             <th>Customer</th>
                                             <th>Service Type</th>
                                             <th>Model</th>
@@ -202,6 +241,7 @@ try {
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>

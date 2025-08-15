@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once('../../../config/database.php');
+require_once('../../config/database.php');
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../../index.php');
+    header('Location: ../../index.php');
     exit();
 }
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_admin'])) {
         // Validate required fields
         if (empty($name) || empty($username) || empty($email) || empty($phone)) {
             $_SESSION['error_message'] = 'Please fill in all required fields.';
-            header('Location: ../index.php');
+            header('Location: ../settings.php');
             exit;
         }
         
@@ -32,14 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_admin'])) {
         $stmt->execute([$username, $email, $admin_id]);
         if ($stmt->fetch()) {
             $_SESSION['error_message'] = 'Username or email already exists.';
-            header('Location: ../index.php');
+            header('Location: ../settings.php');
             exit;
         }
         
         // Handle profile picture upload
         $profile_picture_path = null;
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = '../../../uploads/profile_pictures/';
+            $upload_dir = '../../uploads/profile_pictures/';
             
             // Create directory if it doesn't exist
             if (!is_dir($upload_dir)) {
@@ -52,14 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_admin'])) {
             
             if (!in_array($extension, $allowed_extensions)) {
                 $_SESSION['error_message'] = 'Invalid file type. Please upload JPG, PNG, or GIF files only.';
-                header('Location: ../index.php');
+                header('Location: ../settings.php');
                 exit;
             }
             
             // Check file size (2MB limit)
             if ($_FILES['profile_picture']['size'] > 2 * 1024 * 1024) {
                 $_SESSION['error_message'] = 'File size exceeds 2MB limit.';
-                header('Location: ../index.php');
+                header('Location: ../settings.php');
                 exit;
             }
             
@@ -73,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_admin'])) {
                 $stmt = $pdo->prepare("SELECT profile_picture FROM admins WHERE id = ?");
                 $stmt->execute([$admin_id]);
                 $old_admin = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($old_admin && !empty($old_admin['profile_picture']) && file_exists('../../../' . $old_admin['profile_picture'])) {
-                    unlink('../../../' . $old_admin['profile_picture']);
+                if ($old_admin && !empty($old_admin['profile_picture']) && file_exists('../../' . $old_admin['profile_picture'])) {
+                    unlink('../../' . $old_admin['profile_picture']);
                 }
             } else {
                 $_SESSION['error_message'] = 'Failed to upload profile picture.';
-                header('Location: ../index.php');
+                header('Location: ../settings.php');
                 exit;
             }
         }
@@ -106,21 +106,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_admin'])) {
         }
         
         $_SESSION['success_message'] = 'Admin updated successfully!';
-        header('Location: ../index.php');
+        header('Location: ../settings.php');
         exit;
         
     } catch (PDOException $e) {
         $_SESSION['error_message'] = 'Database error: ' . $e->getMessage();
-        header('Location: ../index.php');
+        header('Location: ../settings.php');
         exit;
     } catch (Exception $e) {
         $_SESSION['error_message'] = 'Error: ' . $e->getMessage();
-        header('Location: ../index.php');
+        header('Location: ../settings.php');
         exit;
     }
 } else {
     $_SESSION['error_message'] = 'Invalid request.';
-    header('Location: ../index.php');
+    header('Location: ../settings.php');
     exit;
 }
 ?>

@@ -56,10 +56,13 @@ if (isset($_SESSION['user_id'])) {
 require_once 'includes/header.php';
 ?>
 <body>
-<div class="wrapper d-flex">
-    <?php require_once 'includes/sidebar.php'; ?>
+ <div class="wrapper">
+        <?php
+        // Include sidebar
+        require_once 'includes/sidebar.php';
+        ?>
 
-      <!-- Page Content -->
+        <!-- Page Content -->
         <div id="content">
             <nav class="navbar navbar-expand-lg navbar-light bg-white">
                 <div class="container-fluid">
@@ -79,7 +82,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -96,56 +99,62 @@ require_once 'includes/header.php';
                     </div>
                 </div>
             </nav>
-    <div id="content" class="flex-grow-1">
-        <div class="container-fluid py-4">
-            <!-- Print Header (hidden by default, shown only when printing) -->
-            <div class="print-header" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
-                    </div>
-                    <div class="text-end">
-                        <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
-                        <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
-                    </div>
-                </div>
+
+<div class="container mt-4">
+    <h3>Sales Report</h3>
+    
+    <!-- Print Header (hidden by default, shown only when printing) -->
+    <div class="print-header" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-0">Sales Report</h4>
-                    <p class="text-muted mb-0">View and print all completed sales with filters</p>
-                </div>
-                <button class="btn btn-success" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print
-                </button>
+            <div class="text-end">
+                <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
+                <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
             </div>
-            <form method="get" class="mb-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label for="filter" class="form-label">Filter By</label>
-                        <select name="filter" id="filter" onchange="this.form.submit()" class="form-select">
-                            <option value="day" <?= $filter=='day'?'selected':'' ?>>Today</option>
-                            <option value="week" <?= $filter=='week'?'selected':'' ?>>This Week</option>
-                            <option value="month" <?= $filter=='month'?'selected':'' ?>>This Month</option>
-                            <option value="year" <?= $filter=='year'?'selected':'' ?>>This Year</option>
-                            <option value="custom" <?= $filter=='custom'?'selected':'' ?>>Custom</option>
-                        </select>
-                    </div>
-                    <?php if ($filter == 'custom'): ?>
-                    <div class="col-md-3">
-                        <label for="from" class="form-label">From</label>
-                        <input type="date" name="from" id="from" value="<?= htmlspecialchars($custom_from) ?>" class="form-control" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="to" class="form-label">To</label>
-                        <input type="date" name="to" id="to" value="<?= htmlspecialchars($custom_to) ?>" class="form-control" required>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Apply</button>
-                    </div>
-                    <?php endif; ?>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-0">View and print all completed sales with filters</p>
+        </div>
+        <button class="btn btn-success" onclick="window.print()">
+            <i class="fas fa-print"></i> Print
+        </button>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Filter Sales Report</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="filter" class="form-label">Filter By</label>
+                    <select name="filter" id="filter" onchange="this.form.submit()" class="form-select">
+                        <option value="day" <?= $filter=='day'?'selected':'' ?>>Today</option>
+                        <option value="week" <?= $filter=='week'?'selected':'' ?>>This Week</option>
+                        <option value="month" <?= $filter=='month'?'selected':'' ?>>This Month</option>
+                        <option value="year" <?= $filter=='year'?'selected':'' ?>>This Year</option>
+                        <option value="custom" <?= $filter=='custom'?'selected':'' ?>>Custom</option>
+                    </select>
                 </div>
+                <?php if ($filter == 'custom'): ?>
+                <div class="col-md-3">
+                    <label for="from" class="form-label">From</label>
+                    <input type="date" name="from" id="from" value="<?= htmlspecialchars($custom_from) ?>" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="to" class="form-label">To</label>
+                    <input type="date" name="to" id="to" value="<?= htmlspecialchars($custom_to) ?>" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                </div>
+                <?php endif; ?>
             </form>
+        </div>
+    </div>
             <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="card text-bg-primary mb-3">
@@ -178,8 +187,9 @@ require_once 'includes/header.php';
             <div class="card">
                 <div class="card-body">
                     <div id="sales-report-print">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
+                        <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Order #</th>
@@ -201,7 +211,8 @@ require_once 'includes/header.php';
                                         <tr><td colspan="4" class="text-center">No sales found.</td></tr>
                                     <?php endif; ?>
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                         
                        <!-- Summary Section for Print -->
@@ -231,7 +242,7 @@ require_once 'includes/header.php';
  <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
 <script>
 function printSalesReport() {
     var printContents = document.getElementById('sales-report-print').innerHTML;
@@ -246,11 +257,21 @@ function printSalesReport() {
 <style>
 @media print {
     /* Hide screen elements */
-    .navbar, .sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse,
+    .navbar, .sidebar, #sidebar, .wrapper > #sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse, #content nav,
     .row.mb-4, /* This hides the summary cards row */
     .card.text-bg-primary, .card.text-bg-info, .card.text-bg-success /* Extra safety for summary cards */
     {
         display: none !important;
+    }
+    
+    /* Hide wrapper sidebar structure */
+    .wrapper {
+        display: block !important;
+    }
+    
+    #content {
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 
     /* Show print header */

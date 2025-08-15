@@ -15,6 +15,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/style.css?v=<?= time() ?>">
+    <!-- Sidebar JS -->
+    <script src="../js/sidebar.js" defer></script>
     <style>
         #sidebar .components li a[aria-expanded="true"] {
             background: rgba(255, 255, 255, 0.1);

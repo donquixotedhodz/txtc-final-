@@ -65,7 +65,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -83,35 +83,12 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <!-- Print Header (hidden by default, shown only when printing) -->
-                <div class="print-header" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
-                        </div>
-                        <div class="text-end">
-                            <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
-                            <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0">Technicians</h4>
-                        <p class="text-muted mb-0">Manage technician accounts and assignments</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTechnicianModal">
-                            <i class="fas fa-plus me-2"></i>Add Technician
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" onclick="window.print()">
-                            <i class="fas fa-print me-2"></i>Print
-                        </button>
-                    </div>
-                </div>
+<div class="container mt-4">
+    <h3>Technicians</h3>
+    
+    <div class="mb-4">
+        <p class="text-muted mb-0">Manage technician accounts and assignments</p>
+    </div>
 
                 <!-- Alert Messages -->
                 <?php 
@@ -252,7 +229,8 @@ require_once 'includes/header.php';
                         </div>
                     </div>
                 </div>
-            </div>
+</div>
+
         </div>
     </div>
 
@@ -361,7 +339,7 @@ require_once 'includes/header.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
     <script>
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -515,4 +493,4 @@ require_once 'includes/header.php';
         }
     </style>
 </body>
-</html> 
+</html>

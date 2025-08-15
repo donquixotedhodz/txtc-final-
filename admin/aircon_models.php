@@ -107,7 +107,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -246,7 +246,7 @@ require_once 'includes/header.php';
   <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
     <script>
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

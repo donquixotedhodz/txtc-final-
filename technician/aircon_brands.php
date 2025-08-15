@@ -12,8 +12,28 @@ try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Fetch all aircon models (all columns except created_at)
-    $stmt = $pdo->query("SELECT id, brand, model_name, price FROM aircon_models ORDER BY brand ASC, model_name ASC");
+    // Handle search functionality
+    $search_brand = isset($_GET['search_brand']) ? trim($_GET['search_brand']) : '';
+    $search_model = isset($_GET['search_model']) ? trim($_GET['search_model']) : '';
+    
+    // Build the query with search filters
+    $sql = "SELECT id, brand, model_name, price FROM aircon_models WHERE 1=1";
+    $params = [];
+    
+    if (!empty($search_brand)) {
+        $sql .= " AND brand LIKE ?";
+        $params[] = '%' . $search_brand . '%';
+    }
+    
+    if (!empty($search_model)) {
+        $sql .= " AND model_name LIKE ?";
+        $params[] = '%' . $search_model . '%';
+    }
+    
+    $sql .= " ORDER BY brand ASC, model_name ASC";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $models = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Get technician details for sidebar/header
@@ -68,20 +88,46 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid py-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0">Aircon Models</h4>
-                        <p class="text-muted mb-0">List of all aircon models in the system</p>
+            <div class="container mt-4">
+                <h3 class="mb-3">Aircon Models</h3>
+                <p class="text-muted mb-4">Browse and search through all available aircon models in the system.</p>
+
+                <!-- Search Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search_brand" class="form-label">Search by Brand</label>
+                                <input type="text" class="form-control" id="search_brand" name="search_brand" 
+                                       value="<?= htmlspecialchars($_GET['search_brand'] ?? '') ?>" placeholder="Enter brand name...">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="search_model" class="form-label">Search by Model</label>
+                                <input type="text" class="form-control" id="search_model" name="search_model" 
+                                       value="<?= htmlspecialchars($_GET['search_model'] ?? '') ?>" placeholder="Enter model name...">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                <?php if (!empty($_GET['search_brand']) || !empty($_GET['search_model'])): ?>
+                                    <a href="aircon_brands.php" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Clear Filter
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="card">
+
+                <div class="card mb-4">
                     <div class="card-body">
                         <?php if (empty($models)): ?>
                             <p class="text-muted">No aircon models found.</p>
                         <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
+                            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
                                             <th>ID</th>
@@ -100,7 +146,8 @@ require_once 'includes/header.php';
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
-                                </table>
+                                    </table>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>

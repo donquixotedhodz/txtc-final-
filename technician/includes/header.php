@@ -17,19 +17,6 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        #sidebar .components li a[aria-expanded="true"] {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        #sidebar .components li .collapse {
-            padding-left: 1rem;
-        }
-        #sidebar .components li .collapse a {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-        #sidebar .components li .collapse a:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
         .technician-item {
             display: flex;
             align-items: center;
@@ -137,4 +124,4 @@
 <body>
     <!-- Rest of the file remains unchanged -->
 </body>
-</html> 
+</html>

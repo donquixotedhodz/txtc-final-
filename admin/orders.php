@@ -124,7 +124,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -142,72 +142,80 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0">Orders</h4>
-                        <p class="text-muted mb-0">Manage and track all job orders</p>
-                    </div>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobOrderModal">
-                        <i class="fas fa-plus me-2"></i>Add Survey Order
+<div class="container mt-4">
+    <h3>Orders</h3>
+    
+    <div class="mb-4">
+        <p class="text-muted mb-0">Manage and track all job orders</p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Job Orders</h5>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobOrderModal">
+                     <i class="fas fa-plus me-2"></i>Add Survey Order
+                 </button>
+            </div>
+
+            <!-- Search and Filter Form -->
+            <form method="GET" action="" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search_customer" class="form-label">Search Customer</label>
+                    <input type="text" class="form-control" id="search_customer" name="search_customer" value="<?= htmlspecialchars($search_customer) ?>" placeholder="Enter customer name">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="orders.php" class="btn btn-outline-secondary w-100">Clear Filter</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- Search and Filter Form -->
-                <form method="GET" action="" class="mb-4">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label for="search_customer" class="form-label">Search Customer</label>
-                            <input type="text" class="form-control" id="search_customer" name="search_customer" value="<?= htmlspecialchars($search_customer) ?>" placeholder="Enter customer name">
-                        </div>
-                        <div class="col-md-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary w-100">Search</button>
-                            <a href="orders.php" class="btn btn-outline-secondary w-100">Clear Filter</a>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Orders Table -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Phone</th>
-                                        <th>Address</th>
-                                        <th>Order Count</th>
-                                        <th class="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($customerOrders as $customer): ?>
-                                    <tr>
-                                        <td>
-                                            <span class="fw-medium">
-                                                <?= htmlspecialchars($customer['customer_name']) ?>
-                                            </span>
-                                        </td>
-                                        <td><i class="fas fa-phone text-primary me-1"></i><?= htmlspecialchars($customer['customer_phone']) ?></td>
-                                        <td><i class="fas fa-map-marker-alt text-danger me-1"></i><?= htmlspecialchars($customer['customer_address']) ?></td>
-                                        <td><?= (int)$customer['order_count'] ?></td>
-                                        <td class="text-center">
-                                            <a href="customer_orders.php?customer_id=<?= (int)$customer['customer_id'] ?>" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-list"></i> View Orders
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <!-- Orders Table -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Order Count</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($customerOrders as $customer): ?>
+                        <tr>
+                            <td>
+                                <span class="fw-medium">
+                                    <?= htmlspecialchars($customer['customer_name']) ?>
+                                </span>
+                            </td>
+                            <td><i class="fas fa-phone text-primary me-1"></i><?= htmlspecialchars($customer['customer_phone']) ?></td>
+                            <td><i class="fas fa-map-marker-alt text-danger me-1"></i><?= htmlspecialchars($customer['customer_address']) ?></td>
+                            <td><?= (int)$customer['order_count'] ?></td>
+                            <td class="text-center">
+                                <a href="customer_orders.php?customer_id=<?= (int)$customer['customer_id'] ?>" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-list"></i> View Orders
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 
 
@@ -406,7 +414,7 @@ require_once 'includes/header.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
     <style>
         
     </style>

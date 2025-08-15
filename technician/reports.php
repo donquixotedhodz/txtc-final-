@@ -34,18 +34,18 @@ $custom_from = $_GET['from'] ?? '';
 $custom_to = $_GET['to'] ?? '';
 $search_customer = $_GET['search_customer'] ?? '';
 
-$where = 'assigned_technician_id = ?';
+$where = 'job_orders.assigned_technician_id = ?';
 $params = [$_SESSION['user_id']];
 
 // Date filters
 switch ($filter) {
-    case 'day': $where .= " AND DATE(created_at) = CURDATE()"; break;
-    case 'week': $where .= " AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)"; break;
-    case 'month': $where .= " AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())"; break;
-    case 'year': $where .= " AND YEAR(created_at) = YEAR(CURDATE())"; break;
+    case 'day': $where .= " AND DATE(job_orders.created_at) = CURDATE()"; break;
+    case 'week': $where .= " AND YEARWEEK(job_orders.created_at, 1) = YEARWEEK(CURDATE(), 1)"; break;
+    case 'month': $where .= " AND YEAR(job_orders.created_at) = YEAR(CURDATE()) AND MONTH(job_orders.created_at) = MONTH(CURDATE())"; break;
+    case 'year': $where .= " AND YEAR(job_orders.created_at) = YEAR(CURDATE())"; break;
     case 'custom':
         if ($custom_from && $custom_to) {
-            $where .= " AND DATE(created_at) BETWEEN ? AND ?";
+            $where .= " AND DATE(job_orders.created_at) BETWEEN ? AND ?";
             $params[] = $custom_from;
             $params[] = $custom_to;
         }
@@ -54,7 +54,7 @@ switch ($filter) {
 
 // Customer name filter
 if (!empty($search_customer)) {
-    $where .= " AND customer_name LIKE ?";
+    $where .= " AND job_orders.customer_name LIKE ?";
     $params[] = '%' . $search_customer . '%';
 }
 
@@ -85,7 +85,7 @@ require_once 'includes/header.php';
 ?>
 <body>
     
-<div class="wrapper d-flex">
+<div class="wrapper">
     <?php require_once 'includes/sidebar.php'; ?>
 
      <!-- Page Content -->
@@ -126,7 +126,7 @@ require_once 'includes/header.php';
                 </div>
             </nav>
             
-            <div class="container-fluid py-4">
+            <div class="container mt-4">
             <!-- Print Header (hidden by default, shown only when printing) -->
             <div class="print-header" style="display: none;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -144,8 +144,8 @@ require_once 'includes/header.php';
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 class="mb-0">My Job Orders Report</h4>
-                    <p class="text-muted mb-0">All your assigned job orders including cancelled, with filters and pagination</p>
+                    <h3 class="mb-3">My Job Orders Report</h3>
+                <p class="text-muted mb-4">All your assigned job orders including cancelled, with filters and pagination.</p>
                 </div>
                 <button class="btn btn-success" onclick="window.print()">
                     <i class="fas fa-print"></i> Print
@@ -210,11 +210,12 @@ require_once 'includes/header.php';
             </div>
 
             <!-- Job Orders Table -->
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-body">
                     <div id="job-orders-report-print">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
+                        <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Order #</th>
@@ -312,7 +313,8 @@ require_once 'includes/header.php';
                                         <tr><td colspan="10" class="text-center">No job orders found.</td></tr>
                                     <?php endif; ?>
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                         <!-- Pagination -->
                         <nav>
@@ -367,6 +369,7 @@ require_once 'includes/header.php';
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
 </div>

@@ -22,6 +22,18 @@ try {
         header('Location: orders.php');
         exit();
     }
+    // Get search parameter
+    $search_ticket = isset($_GET['search_ticket']) ? trim($_GET['search_ticket']) : '';
+    
+    // Build the WHERE clause
+    $where_clause = "WHERE jo.customer_id = ?";
+    $params = [$customer_id];
+    
+    if (!empty($search_ticket)) {
+        $where_clause .= " AND jo.job_order_number LIKE ?";
+        $params[] = '%' . $search_ticket . '%';
+    }
+    
     // Get all orders for this customer with aircon model information
     $stmt = $pdo->prepare("
         SELECT 
@@ -32,10 +44,10 @@ try {
         FROM job_orders jo 
         LEFT JOIN aircon_models am ON jo.aircon_model_id = am.id 
         LEFT JOIN technicians t ON jo.assigned_technician_id = t.id
-        WHERE jo.customer_id = ? 
+        $where_clause
         ORDER BY jo.created_at DESC
     ");
-    $stmt->execute([$customer_id]);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // Fetch technicians and aircon models for dropdowns
     $stmt = $pdo->query("SELECT id, name FROM technicians");
@@ -84,7 +96,7 @@ try {
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                     <i class="fas fa-user me-2 text-primary"></i>
                                     <span>Profile</span>
                                 </a>
@@ -101,28 +113,35 @@ try {
                 </div>
             </div>
         </nav>
-        <div class="container-fluid">
-            <!-- Pop-up Notifications (moved above header) -->
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-4" role="alert" style="z-index: 9999; min-width: 300px;">
-                    <?= $_SESSION['success']; unset($_SESSION['success']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-4" role="alert" style="z-index: 9999; min-width: 300px;">
-                    <?= $_SESSION['error']; unset($_SESSION['error']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-0">Orders for <?= htmlspecialchars($customer['name']) ?></h4>
-                    <p class="text-muted mb-0">
-                        <i class="fas fa-phone text-primary me-1"></i><?= htmlspecialchars($customer['phone']) ?> <br>
-                        <i class="fas fa-map-marker-alt text-danger me-1"></i><?= htmlspecialchars($customer['address']) ?>
-                    </p>
-                </div>
+
+<div class="container mt-4">
+    <!-- Pop-up Notifications (moved above header) -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-4" role="alert" style="z-index: 9999; min-width: 300px;">
+            <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-4" role="alert" style="z-index: 9999; min-width: 300px;">
+            <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    
+    <h3>Orders for <?= htmlspecialchars($customer['name']) ?></h3>
+    
+    <div class="mb-4">
+        <p class="text-muted mb-0">
+            <i class="fas fa-phone text-primary me-1"></i><?= htmlspecialchars($customer['phone']) ?> <br>
+            <i class="fas fa-map-marker-alt text-danger me-1"></i><?= htmlspecialchars($customer['address']) ?>
+        </p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Customer Orders</h5>
                 <div class="d-flex gap-2">
                     <a href="orders.php" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Customers</a>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#orderTypeModal">
@@ -130,12 +149,40 @@ try {
                     </button>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <?php if (!$orders): ?>
-                        <div class="alert alert-info">No orders found for this customer.</div>
-                    <?php else: ?>
+            
+            <!-- Search Form -->
+            <div class="mb-3">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label mb-2">Search Ticket</label>
+                        <form method="GET" action="" class="d-flex">
+                            <input type="hidden" name="customer_id" value="<?= $customer_id ?>">
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="search_ticket" 
+                                       placeholder="Enter ticket number" 
+                                       value="<?= htmlspecialchars($search_ticket) ?>">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <?php if (!empty($search_ticket)): ?>
+                    <div class="col-md-4">
+                        <div class="mt-4">
+                            <span class="text-muted">Showing results for: <strong><?= htmlspecialchars($search_ticket) ?></strong></span>
+                            <a href="?customer_id=<?= $customer_id ?>" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php if (!$orders): ?>
+                <div class="alert alert-info">No orders found for this customer.</div>
+            <?php else: ?>
+                <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
@@ -236,7 +283,8 @@ try {
                             </tbody>
                         </table>
                     </div>
-                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -702,7 +750,7 @@ try {
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Custom JS -->
-<script src="../js/dashboard.js"></script>
+<!-- <script src="../js/dashboard.js"></script> -->
 <style>
     .order-type-card {
         transition: all 0.3s ease;
@@ -1186,3 +1234,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+</div>
+
+</body>
+</html>

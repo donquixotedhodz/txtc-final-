@@ -57,77 +57,284 @@ body {
     align-items: stretch;
 }
 
-#sidebar {
+/* Modern Sidebar Styles */
+.modern-sidebar {
     min-width: 280px;
     max-width: 280px;
     min-height: 100vh;
-    transition: all 0.3s;
-    background: var(--sidebar-bg) !important;
-    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    background: #1a1d29 !important;
+    transition: all 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#sidebar.active {
+.modern-sidebar.active {
     margin-left: -280px;
 }
 
-#sidebar .sidebar-header {
-    padding: 25px 20px;
-    background: var(--sidebar-header);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 30px 20px;
+    background: #1a1d29;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-#sidebar .sidebar-header h3 {
-    font-size: 1.5rem;
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.sidebar-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #4A90E2;
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.5), 0 0 40px rgba(74, 144, 226, 0.3), 0 0 60px rgba(74, 144, 226, 0.1);
+    transition: all 0.3s ease;
+}
+
+.sidebar-logo:hover {
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.7), 0 0 50px rgba(74, 144, 226, 0.5), 0 0 80px rgba(74, 144, 226, 0.3);
+    transform: scale(1.05);
+}
+
+.brand-text {
+    font-size: 1.25rem;
     font-weight: 600;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    padding: 16px 0;
+}
+
+.menu-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
-    color: #fff;
 }
 
-#sidebar ul.components {
-    padding: 20px 0;
+.menu-item {
+    margin: 4px 12px;
 }
 
-#sidebar ul li a {
-    padding: 12px 25px;
-    font-size: 1rem;
+.menu-link {
     display: flex;
     align-items: center;
-    color: rgba(255, 255, 255, 0.85);
+    padding: 12px 16px;
+    color: #9ca3af;
     text-decoration: none;
-    transition: all 0.3s;
-}
-
-#sidebar ul li a i {
-    margin-right: 10px;
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-#sidebar ul li a:hover {
-    background: var(--sidebar-hover);
-    color: #fff;
-    padding-left: 30px;
-}
-
-#sidebar ul li.active > a {
-    background: var(--sidebar-active);
-    color: #fff;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
-#sidebar ul ul a {
-    font-size: 0.95rem !important;
-    padding-left: 50px !important;
-    background: rgba(255, 255, 255, 0.1);
+.menu-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.menu-link i {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 16px;
+}
+
+.menu-text {
+    flex: 1;
+}
+
+.dropdown-icon {
+    margin-left: auto;
+    margin-right: 0 !important;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-toggle[aria-expanded="true"] .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+/* Active States */
+.menu-item.active > .menu-link {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.menu-item.active > .menu-link:hover {
+    background: #2563eb;
+}
+
+/* Submenu Styles */
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.submenu-item {
+    margin: 0;
+}
+
+.submenu-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px 10px 48px;
+    color: #9ca3af;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+.submenu-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.submenu-link i {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.submenu-item.active .submenu-link {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-left: 3px solid #3b82f6;
+    padding-left: 45px;
+}
+
+
+
+/* Scrollbar for sidebar */
+.modern-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modern-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 #content {
-    width: 100%;
+    margin-left: 280px;
     min-height: 100vh;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     background: #F5F7FA;
+    padding: 0;
+    width: calc(100% - 280px);
 }
+
+#content.expanded {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modern-sidebar {
+        margin-left: -280px;
+        z-index: 1050;
+    }
+    
+    .modern-sidebar.active {
+        margin-left: 0;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    #content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    #content.expanded {
+        margin-left: 0;
+    }
+    
+    /* Add overlay when sidebar is open on mobile */
+    #content.expanded::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        pointer-events: auto;
+    }
+    
+    #sidebarCollapse {
+        display: block !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .modern-sidebar {
+        margin-left: 0;
+    }
+    
+    .modern-sidebar.active {
+        margin-left: -280px;
+    }
+    
+    #content {
+        margin-left: 280px;
+        width: calc(100% - 280px);
+    }
+    
+    #content.expanded {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    #sidebarCollapse {
+        display: block !important;
+    }
+}
+
+
+
+
+
+
 
 .card {
     border-radius: 15px;
@@ -243,20 +450,7 @@ body {
     background: var(--hover-blue);
 }
 
-@media (max-width: 768px) {
-    #sidebar {
-        margin-left: -280px;
-    }
-    #sidebar.active {
-        margin-left: 0;
-    }
-    #sidebarCollapse span {
-        display: none;
-    }
-    .card {
-        margin-bottom: 20px;
-    }
-}
+
 
 /* Login Styles */
 .login-container {

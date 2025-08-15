@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../config/database.php';
+require_once '../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -55,7 +55,7 @@ require_once 'includes/header.php';
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                      alt="Admin" 
                                      class="rounded-circle me-2" 
                                      width="32" 
@@ -65,7 +65,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                             <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -120,7 +120,7 @@ require_once 'includes/header.php';
                     <div class="col-md-4">
                         <div class="card shadow-sm h-100">
                             <div class="card-body text-center d-flex flex-column align-items-center justify-content-center py-5">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                      alt="Profile" 
                                      class="rounded-circle mb-4" 
                                      style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #4A90E2; box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);">
@@ -196,9 +196,9 @@ require_once 'includes/header.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="../controller/update_profile.php" method="POST" enctype="multipart/form-data">
+                    <form action="controller/update_profile.php" method="POST" enctype="multipart/form-data">
                         <div class="text-center mb-4">
-                            <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                            <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                  alt="Profile" 
                                  class="rounded-circle mb-3" 
                                  style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #4A90E2;">
@@ -244,18 +244,34 @@ require_once 'includes/header.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="../controller/change_password.php" method="POST">
+                    <form action="controller/change_password.php" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Current Password</label>
-                            <input type="password" class="form-control" name="current_password" required>
+                            <div class="position-relative">
+                                <input type="password" class="form-control pe-5" name="current_password" id="current_password" required>
+                                <button class="btn position-absolute top-50 end-0 translate-middle-y me-2" type="button" onclick="togglePassword('current_password')" style="border: none; background: none; color: #6c757d; z-index: 10;">
+                                    <i class="fas fa-eye" id="current_password_icon"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">New Password</label>
-                            <input type="password" class="form-control" name="new_password" required minlength="6">
+                            <div class="position-relative">
+                                <input type="password" class="form-control pe-5" name="new_password" id="new_password" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$">
+                                <button class="btn position-absolute top-50 end-0 translate-middle-y me-2" type="button" onclick="togglePassword('new_password')" style="border: none; background: none; color: #6c757d; z-index: 10;">
+                                    <i class="fas fa-eye" id="new_password_icon"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Password must contain at least one uppercase letter, one lowercase letter, and one number.</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" name="confirm_password" required minlength="6">
+                            <div class="position-relative">
+                                <input type="password" class="form-control pe-5" name="confirm_password" id="confirm_password" required minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$">
+                                <button class="btn position-absolute top-50 end-0 translate-middle-y me-2" type="button" onclick="togglePassword('confirm_password')" style="border: none; background: none; color: #6c757d; z-index: 10;">
+                                    <i class="fas fa-eye" id="confirm_password_icon"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="modal-footer px-0 pb-0">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -270,6 +286,22 @@ require_once 'includes/header.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
+    <script>
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '_icon');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
-</html> 
+</html>

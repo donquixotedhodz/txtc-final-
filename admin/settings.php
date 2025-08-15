@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once('../../config/database.php');
+require_once('../config/database.php');
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../index.php'); // Redirect to login if not logged in or not admin
+    header('Location: ../index.php'); // Redirect to login if not logged in or not admin
     exit();
 }
 
@@ -42,7 +42,7 @@ require_once 'includes/header.php';
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                      alt="Admin" 
                                      class="rounded-circle me-2" 
                                      width="32" 
@@ -52,7 +52,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="../view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -112,7 +112,7 @@ require_once 'includes/header.php';
                                 <tr>
                                     <td><?= htmlspecialchars($adminUser['id'] ?? '') ?></td>
                                     <td>
-                                        <img src="<?= !empty($adminUser['profile_picture']) ? '../../' . htmlspecialchars($adminUser['profile_picture'] ?? '') : 'https://ui-avatars.com/api/?name=' . urlencode($adminUser['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                        <img src="<?= !empty($adminUser['profile_picture']) ? '../' . htmlspecialchars($adminUser['profile_picture'] ?? '') : 'https://ui-avatars.com/api/?name=' . urlencode($adminUser['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                              alt="Admin" 
                                              class="rounded-circle" 
                                              width="32" 
@@ -283,19 +283,8 @@ require_once 'includes/header.php';
    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- <script src="../../js/dashboard.js"></script> -->
+
     <script>
-          // Sidebar toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarCollapse = document.getElementById('sidebarCollapse');
-            if (sidebarCollapse) {
-                sidebarCollapse.addEventListener('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    if (sidebar) {
-                        sidebar.classList.toggle('active');
-                    }
-                });
-            }
-        });
         // Password toggle functionality for create admin modal
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('adminPassword');

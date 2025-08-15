@@ -64,13 +64,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!in_array($file['type'], $allowed_types)) {
                 $_SESSION['error_message'] = "Invalid file type. Please upload a JPG, PNG, or GIF image.";
-                header('Location: ../view/profile.php');
+                header('Location: ../profile.php');
                 exit();
             }
 
             if ($file['size'] > $max_size) {
                 $_SESSION['error_message'] = "File is too large. Maximum size is 5MB.";
-                header('Location: ../view/profile.php');
+                header('Location: ../profile.php');
                 exit();
             }
 
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 error_log("Failed to move uploaded file to: " . $filepath);
                 $_SESSION['error_message'] = "Failed to upload profile picture. Please try again.";
-                header('Location: ../view/profile.php');
+                header('Location: ../profile.php');
                 exit();
             }
         }
@@ -105,21 +105,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validate input
         if (empty($name) || empty($username) || empty($email) || empty($phone)) {
             $_SESSION['error_message'] = "All fields are required.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
         // Validate email format
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error_message'] = "Invalid email format.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
         // Validate phone format (basic validation)
         if (!preg_match('/^[0-9+\-\s()]{10,}$/', $phone)) {
             $_SESSION['error_message'] = "Invalid phone number format.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$username, $_SESSION['user_id']]);
         if ($stmt->rowCount() > 0) {
             $_SESSION['error_message'] = "Username is already taken.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email, $_SESSION['user_id']]);
         if ($stmt->rowCount() > 0) {
             $_SESSION['error_message'] = "Email is already taken.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($check_stmt->rowCount() === 0) {
             error_log("Profile Update Error: Admin not found with ID " . $_SESSION['user_id']);
             $_SESSION['error_message'] = "Admin account not found.";
-            header('Location: ../view/profile.php');
+            header('Location: ../profile.php');
             exit();
         }
 
@@ -180,21 +180,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error_message'] = "Database error occurred. Please try again.";
         }
 
-        header('Location: ../view/profile.php');
+        header('Location: ../profile.php');
         exit();
 
     } catch (PDOException $e) {
         error_log("Profile Update Error (Connection): " . $e->getMessage());
         $_SESSION['error_message'] = "Database connection error. Please try again.";
-        header('Location: ../view/profile.php');
+        header('Location: ../profile.php');
         exit();
     } catch (Exception $e) {
         error_log("Profile Update Error (General): " . $e->getMessage());
         $_SESSION['error_message'] = "An unexpected error occurred. Please try again.";
-        header('Location: ../view/profile.php');
+        header('Location: ../profile.php');
         exit();
     }
 } else {
-    header('Location: ../view/profile.php');
+    header('Location: ../profile.php');
     exit();
-} 
+}

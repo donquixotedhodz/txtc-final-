@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../../config/database.php';
+require_once '../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../index.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -86,7 +86,7 @@ require_once 'includes/header.php';
  <div class="wrapper">
         <?php
         // Include sidebar
-        require_once '../settings/includes/sidebar.php';
+        require_once 'includes/sidebar.php';
         ?>
 
         <!-- Page Content -->
@@ -99,7 +99,7 @@ require_once 'includes/header.php';
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?: 'Admin') . '&background=1a237e&color=fff' ?>" 
                                      alt="Admin" 
                                      class="rounded-circle me-2" 
                                      width="32" 
@@ -116,7 +116,7 @@ require_once 'includes/header.php';
                                 </li>
                                 <li><hr class="dropdown-divider my-2"></li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="../logout.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="logout.php">
                                         <i class="fas fa-sign-out-alt me-2"></i>
                                         <span>Logout</span>
                                     </a>
@@ -199,7 +199,7 @@ require_once 'includes/header.php';
                     <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
                 <div class="col-md-2">
-                    <a href="estimation.php" class="btn btn-outline-secondary w-100">Clear</a>
+                    <a href="parts_management.php" class="btn btn-outline-secondary w-100">Clear</a>
                 </div>
             </form>
         </div>
@@ -405,7 +405,7 @@ require_once 'includes/header.php';
             formData.append('action', 'update');
             formData.append('type', 'part');
             
-            fetch('../controller/unified_estimation_controller.php', {
+            fetch('controller/parts_management_controller.php', {
                 method: 'POST',
                 body: formData
             })
@@ -431,7 +431,7 @@ require_once 'includes/header.php';
             formData.append('type', 'part');
             formData.append('warranty_months', '12'); // Default warranty
             
-            fetch('../controller/unified_estimation_controller.php', {
+            fetch('controller/parts_management_controller.php', {
                 method: 'POST',
                 body: formData
             })
@@ -458,7 +458,7 @@ require_once 'includes/header.php';
             formData.append('action', 'create');
             formData.append('type', 'part');
             
-            fetch('../controller/unified_estimation_controller.php', {
+            fetch('controller/parts_management_controller.php', {
                 method: 'POST',
                 body: formData
             })
@@ -481,7 +481,7 @@ require_once 'includes/header.php';
         // Delete function
         function deletePart(id, name) {
             if (confirm(`Are you sure you want to delete the part "${name}"?`)) {
-                fetch('../controller/unified_estimation_controller.php', {
+                fetch('controller/parts_management_controller.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

@@ -17,8 +17,11 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $technician = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Get only ongoing orders (pending and in_progress)
-    $stmt = $pdo->prepare("
+    // Handle search functionality
+    $search_ticket = isset($_GET['search_ticket']) ? trim($_GET['search_ticket']) : '';
+    
+    // Get only ongoing orders (pending and in_progress) with optional search
+    $sql = "
         SELECT 
             jo.*,
             COALESCE(am.model_name, 'Not Specified') as model_name 
@@ -26,15 +29,24 @@ try {
         LEFT JOIN aircon_models am ON jo.aircon_model_id = am.id 
         WHERE jo.assigned_technician_id = ? 
         AND jo.status IN ('pending', 'in_progress')
-        AND jo.status != 'cancelled'
-        ORDER BY 
+        AND jo.status != 'cancelled'";
+    
+    $params = [$_SESSION['user_id']];
+    
+    if (!empty($search_ticket)) {
+        $sql .= " AND jo.job_order_number LIKE ?";
+        $params[] = '%' . $search_ticket . '%';
+    }
+    
+    $sql .= " ORDER BY 
             CASE 
                 WHEN jo.status = 'pending' THEN 1
                 WHEN jo.status = 'in_progress' THEN 2
             END,
-            jo.created_at DESC
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
+            jo.created_at DESC";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -87,10 +99,9 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Ongoing Orders</h1>
-                </div>
+            <div class="container mt-4">
+                <h3 class="mb-3">Ongoing Orders</h3>
+                <p class="text-muted mb-4">Manage your pending and in-progress job orders.</p>
 
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="alert alert-danger">
@@ -106,13 +117,37 @@ require_once 'includes/header.php';
                     </div>
                 <?php endif; ?>
 
-                <div class="card">
+                <!-- Search Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search_ticket" class="form-label">Search by Ticket Number</label>
+                                <input type="text" class="form-control" id="search_ticket" name="search_ticket" 
+                                       value="<?= htmlspecialchars($search_ticket) ?>" placeholder="Enter ticket number...">
+                            </div>
+                            <div class="col-md-8 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                <?php if (!empty($search_ticket)): ?>
+                                    <a href="orders.php" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Clear Filter
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
                     <div class="card-body">
                         <?php if (empty($orders)): ?>
                             <p class="text-muted">No ongoing orders found.</p>
                         <?php else: ?>
-                            <div class="table-responsive">
-                            <table class="table table-hover align-middle">
+                            <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Order #</th>
@@ -195,7 +230,8 @@ require_once 'includes/header.php';
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
-                                </table>
+                                    </table>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -203,6 +239,7 @@ require_once 'includes/header.php';
             </div>
         </div>
     </div>
+</div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -419,6 +456,8 @@ require_once 'includes/header.php';
                 });
             });
         });
+
+        // Sidebar toggle functionality is now handled by sidebar.js
     </script>
 </body>
 </html>

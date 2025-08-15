@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once('../../config/database.php');
+require_once('../config/database.php');
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../index.php'); // Redirect to login if not logged in or not admin
+    header('Location: ../index.php'); // Redirect to login if not logged in or not admin
     exit();
 }
 
@@ -26,13 +26,13 @@ try {
     echo "Connection failed: " . $e->getMessage();
 }
 
-require_once '../includes/header.php';
+require_once 'includes/header.php';
 ?>
 <body></body>
  <div class="wrapper">
         <?php
         // Include sidebar
-        require_once '../includes/sidebar.php';
+        require_once 'includes/sidebar.php';
         ?>
 
 
@@ -47,7 +47,7 @@ require_once '../includes/header.php';
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="<?= !empty($admin['profile_picture']) ? '../../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?? $_SESSION['username']) . '&background=1a237e&color=fff' ?>" 
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?? $_SESSION['username']) . '&background=1a237e&color=fff' ?>" 
                                      alt="Admin" 
                                      class="rounded-circle me-2" 
                                      width="32" 
@@ -56,7 +56,7 @@ require_once '../includes/header.php';
                                 <span class="me-3">Welcome, <?= htmlspecialchars($admin['name'] ?? $_SESSION['username']) ?></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="../view/profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>
@@ -79,4 +79,4 @@ require_once '../includes/header.php';
     <!-- Custom JS -->
     <!-- Include any necessary custom JS -->
 </body>
-</html> 
+</html>

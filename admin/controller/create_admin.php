@@ -109,6 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Redirect back to the settings page
-header('Location: ../settings/index.php');
+header('Location: ../settings.php');
 exit();
-?> 
+?>

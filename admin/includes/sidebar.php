@@ -4,97 +4,105 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!-- Sidebar -->
-<nav id="sidebar" class="text-white">
+<nav id="sidebar" class="modern-sidebar">
     <div class="sidebar-header">
-        <div class="text-center mb-3">
-            <img src="../images/logo.png" alt="Logo" style="width: 70px; height: 70px; margin-bottom: 10px; border-radius: 50%; border: 2px solid #4A90E2; box-shadow: 0 0 10px rgba(74, 144, 226, 0.5); display: block; margin-left: auto; margin-right: auto;">
+        <div class="logo-container">
+            <img src="../images/logo.png" alt="CodingLab" class="sidebar-logo">
         </div>
     </div>
 
-    <ul class="list-unstyled components">
-        <li class="<?= $current_page === 'dashboard.php' ? 'active' : '' ?>">
-            <a href="dashboard.php" class="<?= $current_page === 'dashboard.php' ? 'active' : '' ?>">
-                <i class="fas fa-tachometer-alt"></i>
-                Dashboard
-            </a>
-        </li>
-        <li class="<?= in_array($current_page, ['orders.php', 'archived.php']) ? 'active' : '' ?>">
-            <a href="#jobOrdersSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['orders.php', 'archived.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['orders.php', 'archived.php']) ? 'active' : '' ?>">
-                <i class="fas fa-clipboard-list"></i>
-                Job Orders
-            </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page, ['orders.php', 'archived.php']) ? 'show' : '' ?>" id="jobOrdersSubmenu">
-                <li class="<?= $current_page == 'orders.php' ? 'active' : '' ?>">
-                    <a href="orders.php">
-                        <i class="fas fa-file-alt"></i>
-                        Orders
-                    </a>
-                </li>
-                <li class="<?= $current_page == 'archived.php' ? 'active' : '' ?>">
-                    <a href="archived.php">
-                        <i class="fas fa-archive"></i>
-                        Archived
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="<?= $current_page === 'technicians.php' ? 'active' : '' ?>">
-            <a href="technicians.php" class="<?= $current_page === 'technicians.php' ? 'active' : '' ?>">
-                <i class="fas fa-users-cog"></i>
-                Technicians
-            </a>
-        </li>
-        <li class="<?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'active' : '' ?>">
-            <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'active' : '' ?>">
-                <i class="fas fa-chart-bar"></i>
-                Reports
-            </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'show' : '' ?>" id="reportsSubmenu">
-                <li class="<?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
-                    <a href="sales_report.php" class="<?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
-                        <i class="fas fa-coins"></i>
-                        Sales Report
-                    </a>
-                </li>
-                <li class="<?= $current_page === 'job_orders_report.php' ? 'active' : '' ?>">
-                    <a href="job_orders_report.php" class="<?= $current_page === 'job_orders_report.php' ? 'active' : '' ?>">
-                        <i class="fas fa-clipboard-list"></i>
-                        Job Orders Report
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="<?= in_array($current_page, ['index.php', 'aircon_models.php', 'cleaning_services.php', 'estimation.php']) ? 'active' : '' ?>">
-            <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['index.php', 'aircon_models.php', 'cleaning_services.php', 'estimation.php']) ? 'true' : 'false' ?>" class="dropdown-toggle <?= in_array($current_page, ['index.php', 'aircon_models.php', 'cleaning_services.php', 'estimation.php']) ? 'active' : '' ?>">
-                <i class="fas fa-cog"></i>
-                Settings
-            </a>
-            <ul class="collapse list-unstyled <?= in_array($current_page, ['index.php', 'aircon_models.php', 'cleaning_services.php', 'estimation.php']) ? 'show' : '' ?>" id="settingsSubmenu">
-                <li class="<?= $current_page === 'index.php' ? 'active' : '' ?>">
-                    <a href="settings/index.php" class="<?= $current_page === 'index.php' ? 'active' : '' ?>">
-                        <i class="fas fa-user-shield"></i>
-                        Account Settings
-                    </a>
-                </li>
-                <li class="<?= $current_page === 'aircon_models.php' ? 'active' : '' ?>">
-                    <a href="aircon_models.php" class="<?= $current_page === 'aircon_models.php' ? 'active' : '' ?>">
-                        <i class="fas fa-snowflake"></i>
-                        Aircon Models
-                    </a>
-                </li>
-                <li class="<?= $current_page === 'cleaning_services.php' ? 'active' : '' ?>">
-                    <a href="cleaning_services.php" class="<?= $current_page === 'cleaning_services.php' ? 'active' : '' ?>">
-                        <i class="fas fa-broom"></i>
-                        Cleaning Services
-                    </a>
-                </li>
-                <li class="<?= $current_page === 'estimation.php' ? 'active' : '' ?>">
-                    <a href="view/estimation.php" class="<?= $current_page === 'estimation.php' ? 'active' : '' ?>">
-                            <i class="fas fa-calculator"></i>
-                            Parts
+    <div class="sidebar-menu">
+        <ul class="menu-list">
+            <li class="menu-item <?= $current_page === 'dashboard.php' ? 'active' : '' ?>">
+                <a href="dashboard.php" class="menu-link">
+                    <i class="fas fa-home"></i>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            
+            <li class="menu-item <?= in_array($current_page, ['orders.php', 'archived.php']) ? 'active' : '' ?>">
+                <a href="#jobOrdersSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['orders.php', 'archived.php']) ? 'true' : 'false' ?>" class="menu-link dropdown-toggle">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span class="menu-text">Job Orders</span>
+                    
+                </a>
+                <ul class="submenu collapse <?= in_array($current_page, ['orders.php', 'archived.php']) ? 'show' : '' ?>" id="jobOrdersSubmenu">
+                    <li class="submenu-item <?= $current_page == 'orders.php' ? 'active' : '' ?>">
+                        <a href="orders.php" class="submenu-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="menu-text">Orders</span>
                         </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
+                    </li>
+                    <li class="submenu-item <?= $current_page == 'archived.php' ? 'active' : '' ?>">
+                        <a href="archived.php" class="submenu-link">
+                            <i class="fas fa-archive"></i>
+                            <span class="menu-text">Archived</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="menu-item <?= $current_page === 'technicians.php' ? 'active' : '' ?>">
+                <a href="technicians.php" class="menu-link">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="menu-text">Technicians</span>
+                </a>
+            </li>
+            
+            <li class="menu-item <?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'active' : '' ?>">
+                <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'true' : 'false' ?>" class="menu-link dropdown-toggle">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="menu-text">Reports</span>
+                </a>
+                <ul class="submenu collapse <?= in_array($current_page, ['reports.php', 'sales_report.php', 'job_orders_report.php']) ? 'show' : '' ?>" id="reportsSubmenu">
+                    <li class="submenu-item <?= $current_page === 'sales_report.php' ? 'active' : '' ?>">
+                        <a href="sales_report.php" class="submenu-link">
+                            <i class="fas fa-coins"></i>
+                            <span class="menu-text">Sales Report</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item <?= $current_page === 'job_orders_report.php' ? 'active' : '' ?>">
+                        <a href="job_orders_report.php" class="submenu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span class="menu-text">Job Orders Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="menu-item <?= in_array($current_page, ['settings.php', 'aircon_models.php', 'cleaning_services.php', 'parts_management.php']) ? 'active' : '' ?>">
+                <a href="#settingsSubmenu" data-bs-toggle="collapse" aria-expanded="<?= in_array($current_page, ['settings.php', 'aircon_models.php', 'cleaning_services.php', 'parts_management.php']) ? 'true' : 'false' ?>" class="menu-link dropdown-toggle">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-text">Settings</span>
+
+                </a>
+                <ul class="submenu collapse <?= in_array($current_page, ['settings.php', 'aircon_models.php', 'cleaning_services.php', 'parts_management.php']) ? 'show' : '' ?>" id="settingsSubmenu">
+                    <li class="submenu-item <?= $current_page === 'settings.php' ? 'active' : '' ?>">
+                        <a href="settings.php" class="submenu-link">
+                            <i class="fas fa-user-shield"></i>
+                            <span class="menu-text">Account Settings</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item <?= $current_page === 'aircon_models.php' ? 'active' : '' ?>">
+                        <a href="aircon_models.php" class="submenu-link">
+                            <i class="fas fa-snowflake"></i>
+                            <span class="menu-text">Aircon Models</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item <?= $current_page === 'cleaning_services.php' ? 'active' : '' ?>">
+                        <a href="cleaning_services.php" class="submenu-link">
+                            <i class="fas fa-broom"></i>
+                            <span class="menu-text">Cleaning Services</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item <?= $current_page === 'parts_management.php' ? 'active' : '' ?>">
+                        <a href="parts_management.php" class="submenu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span class="menu-text">Parts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </nav>

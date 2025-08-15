@@ -57,11 +57,10 @@ if (isset($_SESSION['user_id'])) {
 require_once 'includes/header.php';
 ?>
 <body>
-<div class="wrapper d-flex">
-    <?php require_once 'includes/sidebar.php'; ?>
-
-    <!-- Page Content -->
-    <div id="content">
+    <div class="wrapper">
+        <?php require_once 'includes/sidebar.php'; ?>
+        <!-- Page Content -->
+        <div id="content">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container-fluid">
                 <button type="button" id="sidebarCollapse" class="btn">
@@ -97,8 +96,7 @@ require_once 'includes/header.php';
                 </div>
             </div>
         </nav>
-        
-        <div class="container-fluid py-4">
+            <div class="container mt-4">
             <!-- Print Header (hidden by default, shown only when printing) -->
             <div class="print-header" style="display: none;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -112,15 +110,15 @@ require_once 'includes/header.php';
                     </div>
                 </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-0">Sales Report</h4>
-                    <p class="text-muted mb-0">View and print all completed sales with filters</p>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="mb-3">Sales Report</h3>
+                        <p class="text-muted mb-4">View and print all completed sales with filters.</p>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
                 </div>
-                <button class="btn btn-success" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print
-                </button>
-            </div>
             <form method="get" class="mb-4">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
@@ -184,14 +182,12 @@ require_once 'includes/header.php';
             </div>
 
             <!-- Sales Table -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Sales Details</h5>
-                </div>
+            <div class="card mb-4">
                 <div class="card-body">
                     <?php if (count($sales) > 0): ?>
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="salesTable">
+                    <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0" id="salesTable">
                             <thead>
                                 <tr>
                                     <th>Order ID</th>
@@ -210,7 +206,8 @@ require_once 'includes/header.php';
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                     <?php else: ?>
                     <div class="text-center py-4">
@@ -243,8 +240,8 @@ require_once 'includes/header.php';
                 </div>
             </div>
         </div>
+        </div>
     </div>
-</div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -43,16 +43,11 @@ require_once 'includes/header.php';
 ?>
 
 <style>
-.estimation-builder {
-    background: #F5F7FA;
-    min-height: 100vh;
-}
-
 .components-panel {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    height: calc(100vh - 140px);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    height: calc(100vh - 200px);
     overflow-y: auto;
 }
 
@@ -60,15 +55,15 @@ require_once 'includes/header.php';
     position: sticky;
     top: 20px;
     height: fit-content;
-    max-height: calc(100vh - 140px);
+    max-height: calc(100vh - 200px);
 }
 
 .estimation-panel {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
     overflow-y: auto;
-    max-height: calc(100vh - 140px);
+    max-height: calc(100vh - 200px);
 }
 
 .selected-items-wrapper {
@@ -225,30 +220,18 @@ require_once 'includes/header.php';
                 </div>
             </nav>
 
-            <div class="container-fluid py-4 estimation-builder">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0"><i class="fas fa-calculator me-2"></i>AC Service Estimation Builder</h4>
-                        <p class="text-muted mb-0">Build comprehensive estimates for AC services and repairs</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-secondary" onclick="clearEstimation()">
-                            <i class="fas fa-trash me-2"></i>Clear All
-                        </button>
-                        <button type="button" class="btn btn-success" onclick="saveEstimation()">
-                            <i class="fas fa-save me-2"></i>Save Estimation
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="generatePDF()">
-                            <i class="fas fa-file-pdf me-2"></i>Generate PDF
-                        </button>
-                    </div>
-                </div>
+            <div class="container mt-4">
+                <h3 class="mb-3">AC Service Estimation Builder</h3>
+                <p class="text-muted mb-4">Build comprehensive estimates for AC services and repairs</p>
 
-                <div class="row">
-                    <!-- Components Panel (Left Side) -->
-                    <div class="col-lg-8">
-                        <div class="components-panel p-4">
+
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Components Panel (Left Side) -->
+                            <div class="col-lg-8">
+                                <div class="components-panel p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Components & Services</h5>
                                 <input type="text" class="form-control search-box" style="width: 300px;" placeholder="Search components..." id="searchBox">
@@ -334,7 +317,12 @@ require_once 'includes/header.php';
                                 
                                 <!-- Selected Items -->
                                 <div class="mb-4">
-                                    <h6 class="text-muted mb-3">Selected Items</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="text-muted mb-0">Selected Items</h6>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="clearEstimation()">
+                                            <i class="fas fa-trash me-1"></i>Clear All
+                                        </button>
+                                    </div>
                                     <div class="selected-items-wrapper">
                                         <div id="selectedItems">
                                             <p class="text-muted text-center">No items selected</p>
@@ -369,6 +357,9 @@ require_once 'includes/header.php';
                                     <span id="totalAmount">₱0.00</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
                         </div>
                     </div>
                 </div>
@@ -527,67 +518,13 @@ require_once 'includes/header.php';
         function clearEstimation() {
             if (confirm('Are you sure you want to clear all selected items?')) {
                 selectedItems = [];
-                document.getElementById('customerName').value = '';
-                document.getElementById('customerPhone').value = '';
-                document.getElementById('customerAddress').value = '';
                 document.getElementById('additionalFees').value = '0';
                 document.getElementById('discountAmount').value = '0';
                 updateEstimation();
             }
         }
 
-        function saveEstimation() {
-            const customerName = document.getElementById('customerName').value;
-            const customerPhone = document.getElementById('customerPhone').value;
-            const customerAddress = document.getElementById('customerAddress').value;
-            
-            if (!customerName || !customerPhone) {
-                alert('Please enter customer name and phone number.');
-                return;
-            }
-            
-            if (selectedItems.length === 0) {
-                alert('Please select at least one item.');
-                return;
-            }
-            
-            const estimationData = {
-                customer: {
-                    name: customerName,
-                    phone: customerPhone,
-                    address: customerAddress
-                },
-                items: selectedItems,
-                totals: {
-                    parts: partsTotal,
-                    labor: laborTotal,
-                    services: servicesTotal,
-                    additionalFees: parseFloat(document.getElementById('additionalFees').value) || 0,
-                    discountAmount: parseFloat(document.getElementById('discountAmount').value) || 0
-                }
-            };
-            
-            // Here you would send the data to a PHP script to save to database
-            console.log('Estimation data:', estimationData);
-            alert('Estimation saved successfully!');
-        }
 
-        function generatePDF() {
-            const customerName = document.getElementById('customerName').value;
-            
-            if (!customerName) {
-                alert('Please enter customer name before generating PDF.');
-                return;
-            }
-            
-            if (selectedItems.length === 0) {
-                alert('Please select at least one item.');
-                return;
-            }
-            
-            // Here you would generate and download the PDF
-            alert('PDF generation feature will be implemented.');
-        }
 
         // Search functionality
         document.getElementById('searchBox').addEventListener('input', function(e) {
@@ -611,6 +548,20 @@ require_once 'includes/header.php';
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarCollapse');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            if (sidebarToggle && sidebar && content) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    content.classList.toggle('expanded');
+                });
+            }
         });
     </script>
 </body>

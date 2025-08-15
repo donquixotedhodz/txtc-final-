@@ -517,6 +517,8 @@ require_once 'includes/header.php';
             ordersChart.update();
         }
 
+        // Sidebar toggle functionality is now handled by sidebar.js
+
 
     </script>
 </body>

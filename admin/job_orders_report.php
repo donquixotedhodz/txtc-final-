@@ -30,8 +30,9 @@ $technicians = $tech_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get filter parameters
 $page = max(1, intval($_GET['page'] ?? 1));
-$limit = 10;
-$offset = ($page - 1) * $limit;
+$show_all = isset($_GET['show_all']) && $_GET['show_all'] == '1';
+$limit = $show_all ? PHP_INT_MAX : 10;
+$offset = $show_all ? 0 : ($page - 1) * $limit;
 
 $filter = $_GET['filter'] ?? '';
 $custom_from = $_GET['from'] ?? '';
@@ -44,13 +45,13 @@ $params = [];
 
 // Date filters
 switch ($filter) {
-    case 'day': $where .= " AND DATE(created_at) = CURDATE()"; break;
-    case 'week': $where .= " AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)"; break;
-    case 'month': $where .= " AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())"; break;
-    case 'year': $where .= " AND YEAR(created_at) = YEAR(CURDATE())"; break;
+    case 'day': $where .= " AND DATE(job_orders.created_at) = CURDATE()"; break;
+    case 'week': $where .= " AND YEARWEEK(job_orders.created_at, 1) = YEARWEEK(CURDATE(), 1)"; break;
+    case 'month': $where .= " AND YEAR(job_orders.created_at) = YEAR(CURDATE()) AND MONTH(job_orders.created_at) = MONTH(CURDATE())"; break;
+    case 'year': $where .= " AND YEAR(job_orders.created_at) = YEAR(CURDATE())"; break;
     case 'custom':
         if ($custom_from && $custom_to) {
-            $where .= " AND DATE(created_at) BETWEEN ? AND ?";
+            $where .= " AND DATE(job_orders.created_at) BETWEEN ? AND ?";
             $params[] = $custom_from;
             $params[] = $custom_to;
         }
@@ -59,13 +60,13 @@ switch ($filter) {
 
 // Technician filter
 if (!empty($selected_technician)) {
-    $where .= " AND assigned_technician_id = ?";
+    $where .= " AND job_orders.assigned_technician_id = ?";
     $params[] = $selected_technician;
 }
 
 // Customer name filter
 if (!empty($search_customer)) {
-    $where .= " AND customer_name LIKE ?";
+    $where .= " AND job_orders.customer_name LIKE ?";
     $params[] = '%' . $search_customer . '%';
 }
 
@@ -107,11 +108,13 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 require_once 'includes/header.php';
 ?>
 <body>
-    
-<div class="wrapper d-flex">
-    <?php require_once 'includes/sidebar.php'; ?>
+ <div class="wrapper">
+        <?php
+        // Include sidebar
+        require_once 'includes/sidebar.php';
+        ?>
 
-     <!-- Page Content -->
+        <!-- Page Content -->
         <div id="content">
             <nav class="navbar navbar-expand-lg navbar-light bg-white">
                 <div class="container-fluid">
@@ -131,7 +134,7 @@ require_once 'includes/header.php';
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2" href="view/profile.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
                                         <i class="fas fa-user me-2 text-primary"></i>
                                         <span>Profile</span>
                                     </a>
@@ -148,91 +151,114 @@ require_once 'includes/header.php';
                     </div>
                 </div>
             </nav>
-    <div id="content" class="flex-grow-1">
-        <div class="container-fluid py-4">
-            <!-- Print Header (hidden by default, shown only when printing) -->
-            <div class="print-header" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
-                        <h2 style="margin: 10px 0; color: #2c3e50;">Job Orders Report</h2>
-                    </div>
-                    <div class="text-end">
-                        <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
-                        <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
-                        <?php if ($filter): ?>
-                            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
-                                Filter: <?= ucfirst($filter) ?>
-                                <?php if ($filter == 'custom' && $custom_from && $custom_to): ?>
-                                    (<?= $custom_from ?> to <?= $custom_to ?>)
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
 
+<div class="container mt-4">
+    <h3>Job Orders Report</h3>
+    
+    <!-- Print Header (hidden by default, shown only when printing) -->
+    <div class="print-header" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <img src="images/logo.png" alt="Company Logo" style="height: 60px; width: auto;">
             </div>
-
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-0">Job Orders Report</h4>
-                    <p class="text-muted mb-0">All job orders including cancelled, with filters and pagination</p>
-                </div>
-                <button class="btn btn-success" onclick="window.print()">
-                    <i class="fas fa-print"></i> Print
-                </button>
+            <div class="text-end">
+                <div style="font-size: 14px; font-weight: bold; color: #2c3e50;">Date Generated:</div>
+                <div style="font-size: 12px; color: #7f8c8d;"><?= date('F j, Y \a\t g:i A') ?></div>
             </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-0">View and print all job orders with filters</p>
+        </div>
+        <button class="btn btn-success" onclick="window.print()">
+            <i class="fas fa-print"></i> Print
+        </button>
+    </div>
 
-            <!-- Filter Form -->
-            <form method="get" class="mb-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <label for="filter" class="form-label">Filter By Date</label>
-                        <select name="filter" id="filter" onchange="this.form.submit()" class="form-select">
-                            <option value="">All</option>
-                            <option value="day" <?= $filter=='day'?'selected':'' ?>>Today</option>
-                            <option value="week" <?= $filter=='week'?'selected':'' ?>>This Week</option>
-                            <option value="month" <?= $filter=='month'?'selected':'' ?>>This Month</option>
-                            <option value="year" <?= $filter=='year'?'selected':'' ?>>This Year</option>
-                            <option value="custom" <?= $filter=='custom'?'selected':'' ?>>Custom</option>
-                        </select>
-                    </div>
-                    <?php if ($filter == 'custom'): ?>
-                    <div class="col-md-2">
-                        <label for="from" class="form-label">From</label>
-                        <input type="date" name="from" id="from" value="<?= htmlspecialchars($custom_from) ?>" class="form-control" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="to" class="form-label">To</label>
-                        <input type="date" name="to" id="to" value="<?= htmlspecialchars($custom_to) ?>" class="form-control" required>
-                    </div>
-                    <?php endif; ?>
-                    <div class="col-md-2">
-                        <label for="technician" class="form-label">Technician</label>
-                        <select name="technician" id="technician" class="form-select" onchange="this.form.submit()">
-                            <option value="">All</option>
-                            <?php foreach ($technicians as $tech): ?>
-                                <option value="<?= $tech['id'] ?>" <?= $selected_technician == $tech['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($tech['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="search_customer" class="form-label">Customer Name</label>
-                        <input type="text" name="search_customer" id="search_customer" value="<?= htmlspecialchars($search_customer) ?>" class="form-control" placeholder="Search customer...">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-primary w-100">Apply</button>
-                    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Filter Job Orders Report</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filter" class="form-label">Filter By Date</label>
+                    <select name="filter" id="filter" onchange="handleFilterChange()" class="form-select">
+                        <option value="">All</option>
+                        <option value="day" <?= $filter=='day'?'selected':'' ?>>Today</option>
+                        <option value="week" <?= $filter=='week'?'selected':'' ?>>This Week</option>
+                        <option value="month" <?= $filter=='month'?'selected':'' ?>>This Month</option>
+                        <option value="year" <?= $filter=='year'?'selected':'' ?>>This Year</option>
+                        <option value="custom" <?= $filter=='custom'?'selected':'' ?>>Custom</option>
+                    </select>
+                </div>
+                <?php if ($filter == 'custom'): ?>
+                <div class="col-md-2">
+                    <label for="from" class="form-label">From</label>
+                    <input type="date" name="from" id="from" value="<?= htmlspecialchars($custom_from) ?>" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label for="to" class="form-label">To</label>
+                    <input type="date" name="to" id="to" value="<?= htmlspecialchars($custom_to) ?>" class="form-control" required>
+                </div>
+                <?php endif; ?>
+                <div class="col-md-2">
+                    <label for="technician" class="form-label">Technician</label>
+                    <select name="technician" id="technician" class="form-select">
+                        <option value="">All</option>
+                        <?php foreach ($technicians as $tech): ?>
+                            <option value="<?= $tech['id'] ?>" <?= $selected_technician == $tech['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($tech['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="search_customer" class="form-label">Customer Name</label>
+                    <input type="text" name="search_customer" id="search_customer" value="<?= htmlspecialchars($search_customer) ?>" class="form-control" placeholder="Search customer...">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+            <!-- Print Button and Filter Info -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <?php if ($filter): ?>
+                        <small class="text-muted">
+                            Showing results for: 
+                            <?php 
+                            switch($filter) {
+                                case 'day': echo 'Today (' . date('M d, Y') . ')';
+                                    break;
+                                case 'week': echo 'This Week (' . date('M d', strtotime('monday this week')) . ' - ' . date('M d, Y', strtotime('sunday this week')) . ')';
+                                    break;
+                                case 'month': echo date('F Y');
+                                    break;
+                                case 'year': echo date('Y');
+                                    break;
+                                case 'custom': echo date('M d, Y', strtotime($custom_from)) . ' - ' . date('M d, Y', strtotime($custom_to));
+                                    break;
+                            }
+                            ?>
+                            <?php if ($selected_technician): ?>
+                                | Technician: <?= htmlspecialchars($technicians[array_search($selected_technician, array_column($technicians, 'id'))]['name']) ?>
+                            <?php endif; ?>
+                            <?php if ($search_customer): ?>
+                                | Customer: <?= htmlspecialchars($search_customer) ?>
+                            <?php endif; ?>
+                        </small>
+                    <?php endif; ?>
+                </div>
+
+            </div>
 
             <!-- Summary Statistics -->
             <div class="row mb-4">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card text-bg-primary mb-3">
                         <div class="card-body">
                             <h5 class="card-title mb-2">Total Orders</h5>
@@ -240,7 +266,7 @@ require_once 'includes/header.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card text-bg-warning mb-3">
                         <div class="card-body">
                             <h5 class="card-title mb-2">Repair Orders</h5>
@@ -248,7 +274,7 @@ require_once 'includes/header.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card text-bg-info mb-3">
                         <div class="card-body">
                             <h5 class="card-title mb-2">Installation Orders</h5>
@@ -256,21 +282,10 @@ require_once 'includes/header.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-bg-success mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Maintenance Orders</h5>
-                            <h3 class="card-text"><?= $summary['maintenance_orders'] ?></h3>
-                            <?php if ($summary['survey_orders'] > 0): ?>
-                                <div class="small mt-1">Survey: <?= $summary['survey_orders'] ?></div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Job Orders Table -->
-            <div class="card">
+            <div class="card mb-4" style="position: relative;">
                 <div class="card-body">
                     <div id="job-orders-report-print">
                         <div class="table-responsive">
@@ -415,13 +430,32 @@ require_once 'includes/header.php';
                         <!-- Pagination -->
                         <nav>
                             <ul class="pagination justify-content-center">
-                                <?php for ($i = 1; $i <= ceil($total / $limit); $i++): ?>
-                                    <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                        <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
+                                <?php if (!$show_all && $total > 10): ?>
+                                    <?php for ($i = 1; $i <= ceil($total / 10); $i++): ?>
+                                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                            <a class="page-link pagination-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i, 'show_all' => ''])) ?>" data-page="<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['show_all' => '1', 'page' => ''])) ?>">Show All</a>
                                     </li>
-                                <?php endfor; ?>
+                                <?php elseif ($show_all): ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['show_all' => '', 'page' => '1'])) ?>">Show Pages</a>
+                                    </li>
+                                <?php endif; ?>
                             </ul>
                         </nav>
+                        
+                        <!-- Loading overlay -->
+                        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                            <div class="loading-spinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div class="mt-2">Loading...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -431,11 +465,25 @@ require_once 'includes/header.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="../js/dashboard.js"></script>
+    <!-- <script src="../js/dashboard.js"></script> -->
 <!-- Print Script -->
 <script>
 function printJobOrdersReport() {
     window.print();
+}
+
+function handleFilterChange() {
+    const filterSelect = document.getElementById('filter');
+    const selectedValue = filterSelect.value;
+    
+    // If custom is selected, don't submit immediately - wait for date inputs
+    if (selectedValue === 'custom') {
+        // Just reload the page to show the date inputs
+        filterSelect.form.submit();
+    } else {
+        // For other filters, submit immediately
+        filterSelect.form.submit();
+    }
 }
 
 // Update the print button to use the new function
@@ -444,6 +492,71 @@ document.addEventListener('DOMContentLoaded', function() {
     if (printBtn) {
         printBtn.setAttribute('onclick', 'printJobOrdersReport()');
     }
+    
+    // Smooth pagination functionality
+    const paginationLinks = document.querySelectorAll('.pagination-link');
+    const tableCard = document.querySelector('.card.mb-4');
+    const tableResponsive = document.querySelector('.table-responsive');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Don't do anything if clicking the current page
+            if (this.closest('.page-item').classList.contains('active')) {
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState();
+            
+            // Navigate to the new page after a short delay for smooth transition
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 200);
+        });
+    });
+    
+    function showLoadingState() {
+        // Add loading classes
+        if (tableCard) tableCard.classList.add('loading');
+        if (tableResponsive) tableResponsive.classList.add('loading');
+        if (loadingOverlay) loadingOverlay.style.display = 'flex';
+        
+        // Disable pagination links
+        paginationLinks.forEach(link => {
+            link.style.pointerEvents = 'none';
+            link.style.opacity = '0.6';
+        });
+    }
+    
+    // Add smooth scroll to top when page loads
+    if (window.location.search.includes('page=')) {
+        setTimeout(() => {
+            document.querySelector('.card.mb-4').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    }
+    
+    // Add hover effects to pagination
+    paginationLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            if (!this.closest('.page-item').classList.contains('active')) {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            }
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            if (!this.closest('.page-item').classList.contains('active')) {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            }
+        });
+    });
 });
 </script>
 
@@ -453,23 +566,98 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 14px !important;
 }
 
-/* Table font size for print */
+/* Smooth pagination transitions */
+.table-responsive {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.table-responsive.loading {
+    opacity: 0.5;
+}
+
+.pagination-link {
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Loading overlay styles */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 0.375rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: #0d6efd;
+}
+
+/* Card animation */
+.card {
+    transition: all 0.3s ease-in-out;
+}
+
+.card.loading {
+    transform: scale(0.98);
+    opacity: 0.7;
+}
+
+/* Fade in animation for table rows */
+.table tbody tr {
+    animation: fadeInUp 0.3s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pagination hover effects */
+.page-link {
+    transition: all 0.2s ease-in-out;
+}
+
+.page-item.active .page-link {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+}
+
+/* Print styles */
 @media print {
-    .table {
-        font-size: 14px !important;
-    }
-    .table th {
-        font-size: 16px !important;
-    }
     /* Hide screen elements */
-    .navbar, .sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse
+    .navbar, .sidebar, #sidebar, .wrapper > #sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse, #content nav,
+    .row.mb-4, /* This hides the summary cards row */
+    .card.text-bg-primary, .card.text-bg-info, .card.text-bg-success, .card.text-bg-warning /* Extra safety for summary cards */
     {
         display: none !important;
     }
     
-    /* Hide the screen summary cards but show print summary */
-    .row.mb-4 {
-        display: none !important;
+    /* Hide wrapper sidebar structure */
+    .wrapper {
+        display: block !important;
+    }
+    
+    #content {
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 
     /* Show print header */
@@ -489,29 +677,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .print-header .text-end {
         text-align: right !important;
-    }
-    
-    /* Show and style print summary */
-    .print-summary {
-        display: block !important;
-        margin: 20px 0 !important;
-        padding: 15px !important;
-        background: #f8f9fa !important;
-        border: 1px solid #dee2e6 !important;
-        border-radius: 5px !important;
-        page-break-inside: avoid !important;
-    }
-    
-    .print-summary .row {
-        display: flex !important;
-        flex-wrap: wrap !important;
-    }
-    
-    .print-summary .col-3 {
-        flex: 0 0 25% !important;
-        max-width: 25% !important;
-        padding: 5px !important;
-        font-size: 11px !important;
     }
 
     /* Reset page layout */
@@ -536,8 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
         width: 100% !important;
         border-collapse: collapse !important;
         margin-bottom: 20px !important;
-        font-size: 8px !important;
-        table-layout: fixed !important;
+        font-size: 11px !important;
     }
 
     .table th {
@@ -545,40 +709,60 @@ document.addEventListener('DOMContentLoaded', function() {
         color: white !important;
         font-weight: bold !important;
         text-align: left !important;
-        padding: 8px 4px !important;
+        padding: 12px 8px !important;
         border: none !important;
-        font-size: 9px !important;
-        word-wrap: break-word !important;
+        font-size: 12px !important;
     }
 
     .table td {
-        padding: 6px 4px !important;
+        padding: 10px 8px !important;
         border: none !important;
         vertical-align: top !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
     }
-
-    /* Specific column widths for print */
-    .table th:nth-child(1), .table td:nth-child(1) { width: 12% !important; } /* Order # */
-    .table th:nth-child(2), .table td:nth-child(2) { width: 12% !important; } /* Customer */
-    .table th:nth-child(3), .table td:nth-child(3) { width: 8% !important; } /* Service Type */
-    .table th:nth-child(4), .table td:nth-child(4) { width: 8% !important; } /* Brand */
-    .table th:nth-child(5), .table td:nth-child(5) { width: 8% !important; } /* Model */
-    .table th:nth-child(6), .table td:nth-child(6) { width: 10% !important; } /* Part Category */
-    .table th:nth-child(7), .table td:nth-child(7) { width: 10% !important; } /* Part Name */
-    .table th:nth-child(8), .table td:nth-child(8) { width: 8% !important; } /* Price */
-    .table th:nth-child(9), .table td:nth-child(9) { width: 8% !important; } /* Status */
-    .table th:nth-child(10), .table td:nth-child(10) { width: 10% !important; } /* Technician */
-    .table th:nth-child(11), .table td:nth-child(11) { width: 12% !important; } /* Created At */
 
     .table tbody tr:nth-child(even) {
         background: #f8f9fa !important;
     }
 
-    /* Adjust table for print - no action columns to hide in this report */
-    .table {
-        page-break-inside: avoid !important;
+    /* Hide Created At column (last column) */
+    .table th:last-child,
+    .table td:last-child {
+        display: none !important;
+    }
+
+    /* Optimize column widths for better fit */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 8%; }  /* Order # */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 15%; } /* Customer */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 10%; } /* Service Type */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 10%; } /* Brand */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 12%; } /* Model */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 8%; }  /* Part Code */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 15%; } /* Part Name */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 8%; }  /* Price */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 8%; }  /* Status */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 12%; } /* Technician */
+
+    /* Ensure text wraps properly in cells */
+    .table td {
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        white-space: normal !important;
+    }
+
+    /* Adjust badge styling for print */
+    .badge {
+        background: #6c757d !important;
+        color: white !important;
+        padding: 2px 6px !important;
+        border-radius: 3px !important;
+        font-size: 10px !important;
+    }
+
+    /* Print summary styling */
+    .print-summary {
+        display: block !important;
+        margin: 20px 0 !important;
+        padding: 15px !important;
     }
     
     /* Print summary styling */
@@ -616,16 +800,9 @@ document.addEventListener('DOMContentLoaded', function() {
         color: #27ae60 !important;
     }
 
-    .print-summary span[style*="color: #f39c12"] {
-        color: #f39c12 !important;
-    }
-
-    .print-summary span[style*="color: #3498db"] {
-        color: #3498db !important;
-    }
-
-    .print-summary span[style*="color: #9b59b6"] {
-        color: #9b59b6 !important;
+    .print-summary span[style*="color: #e74c3c"] {
+        color: #e74c3c !important;
+        font-size: 13px !important;
     }
 }
 </style>
