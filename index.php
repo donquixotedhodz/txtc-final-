@@ -14,45 +14,44 @@ if (isset($_SESSION['user_id'])) {
 
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])) {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    $role = $_POST['role'] ?? '';
 
-    if (empty($username) || empty($password) || empty($role)) {
-        $error = 'All fields are required';
+    if (empty($username) || empty($password)) {
+        $error = 'Username and password are required';
     } else {
         try {
             $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Check admin login
-            if ($role === 'admin') {
-                $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
-                $stmt->execute([$username]);
-                $user = $stmt->fetch();
+            $user = null;
+            $userRole = null;
 
-                if ($user && password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['role'] = 'admin';
-                    header('Location: admin/dashboard.php');
-                    exit();
-                }
+            // First check admin table
+            $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = 'admin';
+                header('Location: admin/dashboard.php');
+                exit();
             }
-            // Check technician login
-            else if ($role === 'technician') {
-                $stmt = $pdo->prepare("SELECT * FROM technicians WHERE username = ?");
-                $stmt->execute([$username]);
-                $user = $stmt->fetch();
 
-                if ($user && password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['role'] = 'technician';
-                    header('Location: technician/dashboard.php');
-                    exit();
-                }
+            // If not found in admin table, check technician table
+            $stmt = $pdo->prepare("SELECT * FROM technicians WHERE username = ?");
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = 'technician';
+                header('Location: technician/dashboard.php');
+                exit();
             }
 
             $error = 'Invalid username or password';
@@ -117,53 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1rem;
         }
         
-        .role-selector {
-            margin-bottom: 1.5rem;
-        }
-        
-        .role-card {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        
-        .role-card:hover {
-            border-color: var(--primary-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1);
-        }
-        
-        .role-card.selected {
-            border-color: var(--primary-blue);
-            background-color: var(--light-blue);
-        }
-        
-        .role-card i {
-            font-size: 2rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-        
-        .role-card h5 {
-            margin: 0;
-            color: #333;
-            font-weight: 600;
-        }
-        
-        .role-card p {
-            margin: 0.5rem 0 0;
-            color: #666;
-            font-size: 0.9rem;
-        }
+
         
         .form-floating {
             margin-bottom: 1rem;
@@ -400,30 +353,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" action="">
-                <div class="role-selector">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="role-card" data-role="admin">
-                                <i class="fas fa-user-shield"></i>
-                                <h5>Admin</h5>
-                                <p>System Administrator</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="role-card" data-role="technician">
-                                <i class="fas fa-user-cog"></i>
-                                <h5>Technician</h5>
-                                <p>Service Provider</p>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="hidden" name="role" id="selectedRole" value="">
-                </div>
-
                 <div class="form-floating">
-                    <div class="password-field-container">
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-                    </div>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    <label for="username">Username</label>
                 </div>
 
                 <div class="form-floating">
@@ -447,22 +379,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const roleCards = document.querySelectorAll('.role-card');
-            const selectedRoleInput = document.getElementById('selectedRole');
             const passwordInput = document.getElementById('password');
             const toggleButton = document.querySelector('.password-toggle');
             const loadingScreen = document.querySelector('.loading-screen');
             const loginForm = document.querySelector('form');
             const progressBar = document.querySelector('.progress-bar');
-
-            // Role selection functionality
-            roleCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    roleCards.forEach(c => c.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedRoleInput.value = this.dataset.role;
-                });
-            });
 
             // Password toggle functionality
             passwordInput.addEventListener('input', function() {
@@ -482,18 +403,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.preventDefault();
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
-                const role = selectedRoleInput.value;
 
-                if (username && password && role) {
+                if (username && password) {
                     // Create form data
                     const formData = new FormData();
                     formData.append('username', username);
                     formData.append('password', password);
-                    formData.append('role', role);
                     formData.append('check_credentials', 'true');
 
                     // Check credentials first
-                    fetch('check_credentials.php', {
+                    fetch('validation/check_credentials.php', {
                         method: 'POST',
                         body: formData
                     })
@@ -513,7 +432,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 
                                 if (progress >= 100) {
                                     clearInterval(interval);
-                                    loginForm.submit();
+                                    // Add a small delay to ensure session is properly established
+                                    setTimeout(() => {
+                                        window.location.href = data.redirect;
+                                    }, 100);
                                 }
                             }, 40); // 40ms * 50 = 2000ms (2 seconds)
                         } else {
@@ -541,4 +463,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
-</html> 
+</html>

@@ -59,7 +59,7 @@ require_once 'includes/header.php';
                                 </li>
                                 <li><hr class="dropdown-divider my-2"></li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="../logout.php">
+                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="logout.php">
                                         <i class="fas fa-sign-out-alt me-2"></i>
                                         <span>Logout</span>
                                     </a>
