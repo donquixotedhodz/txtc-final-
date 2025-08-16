@@ -157,5 +157,22 @@ require_once 'includes/header.php';
     </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sidebar toggle functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarCollapse');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            if (sidebarToggle && sidebar && content) {
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebar.classList.toggle('active');
+                    content.classList.toggle('expanded');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

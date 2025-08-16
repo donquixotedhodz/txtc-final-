@@ -550,19 +550,36 @@ require_once 'includes/header.php';
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
-        // Sidebar toggle functionality
+        // Include sidebar functionality from external file
+        
+        // Debug sidebar functionality
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking sidebar elements...');
             const sidebarToggle = document.getElementById('sidebarCollapse');
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
             
+            console.log('sidebarToggle:', sidebarToggle);
+            console.log('sidebar:', sidebar);
+            console.log('content:', content);
+            
             if (sidebarToggle && sidebar && content) {
-                sidebarToggle.addEventListener('click', function() {
+                console.log('All elements found, adding click listener...');
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Hamburger clicked!');
                     sidebar.classList.toggle('active');
                     content.classList.toggle('expanded');
+                    console.log('Sidebar classes:', sidebar.className);
+                    console.log('Content classes:', content.className);
                 });
+            } else {
+                console.log('Missing elements - cannot initialize sidebar toggle');
             }
         });
     </script>
+    
+    <!-- Sidebar functionality -->
+    <script src="../js/sidebar.js"></script>
 </body>
 </html>
