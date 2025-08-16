@@ -191,7 +191,7 @@ require_once 'includes/header.php';
                                 <table class="table table-bordered table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Order #</th>
+                                        <th>Ticket Number</th>
                                         <th>Customer</th>
                                         <th>Price</th>
                                         <th>Completed At</th>
@@ -254,6 +254,11 @@ function printSalesReport() {
 
 </script>
 <style>
+/* Make first column (Ticket Number) bold for screen view */
+.table th:nth-child(1), .table td:nth-child(1) {
+    font-weight: bold !important;
+}
+
 @media print {
     /* Hide screen elements */
     .navbar, .sidebar, #sidebar, .wrapper > #sidebar, .btn, .card-header, .modal, .d-flex.gap-2, .pagination, form, .dropdown, #sidebarCollapse, #content nav,
@@ -384,7 +389,7 @@ function printSalesReport() {
      }
 
     /* Optimized column widths for sales report */
-    .table th:nth-child(1), .table td:nth-child(1) { width: 25% !important; }  /* Order # */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 25% !important; font-weight: bold !important; }  /* Order # */
     .table th:nth-child(2), .table td:nth-child(2) { width: 35% !important; } /* Customer */
     .table th:nth-child(3), .table td:nth-child(3) { width: 20% !important; }  /* Price */
     .table th:nth-child(4), .table td:nth-child(4) { width: 20% !important; }  /* Completed At */
@@ -392,6 +397,7 @@ function printSalesReport() {
     .table tbody tr:nth-child(even) {
          background: #fff !important;
      }
+     
 
     /* Print summary styling - positioned on left */
     .print-summary {

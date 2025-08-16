@@ -160,7 +160,7 @@ require_once 'includes/header.php';
         <img src="images/logo.png" alt="Company Logo" class="print-logo">
         <div class="print-admin-info">
             <div><strong>Administrator:</strong> <?= htmlspecialchars($admin['name'] ?? 'Admin') ?></div>
-            <div><strong>Date:</strong> <?= date('F j, Y \a\t g:i A') ?></div>
+            <div><strong>Date:</strong> <?= date('F j, Y') ?> at <?= date('g:i A') ?></div>
         </div>
     </div>
     
@@ -561,6 +561,11 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 14px !important;
 }
 
+/* Make first column (Order #) bold */
+.table th:nth-child(1), .table td:nth-child(1) {
+    font-weight: bold !important;
+}
+
 /* Smooth pagination transitions */
 .table-responsive {
     transition: opacity 0.3s ease-in-out;
@@ -783,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
     /* Optimized column widths for compact print (without Created At) */
-    .table th:nth-child(1), .table td:nth-child(1) { width: 8% !important; }  /* Order # */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 8% !important; font-weight: bold !important; }  /* Order # */
     .table th:nth-child(2), .table td:nth-child(2) { width: 15% !important; } /* Customer */
     .table th:nth-child(3), .table td:nth-child(3) { width: 10% !important; }  /* Service Type */
     .table th:nth-child(4), .table td:nth-child(4) { width: 10% !important; }  /* Brand */
