@@ -235,7 +235,7 @@ require_once 'includes/header.php';
                                         <?php foreach ($orders as $order): ?>
                                         <tr>
                                             <td>
-                                                <span class="fw-semibold">JO-<?= date('Ymd', strtotime($order['created_at'])) ?>-<?= str_pad($order['id'], 4, '0', STR_PAD_LEFT) ?></span>
+                                                <span class="fw-semibold"><?= htmlspecialchars($order['job_order_number']) ?></span>
                                             </td>
                                             <td><?= htmlspecialchars($order['customer_name']) ?></td>
                                             <td>
