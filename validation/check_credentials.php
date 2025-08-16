@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-         // If not found in admin table, check technician table
+         // check technician table
         $stmt = $pdo->prepare("SELECT * FROM technicians WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             exit();
         }
-        // First check admin table
+        // checking admin table
         $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();

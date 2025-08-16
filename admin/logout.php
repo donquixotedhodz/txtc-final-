@@ -50,14 +50,16 @@ session_destroy();
         }
 
         body {
-            background: #f8f9fa;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: var(--primary-blue);
         }
 
         .logout-container {
@@ -73,22 +75,25 @@ session_destroy();
             font-size: 4rem;
             color: var(--primary-blue);
             margin-bottom: 1rem;
-            animation: cool 2s infinite;
+            animation: glowPulse 3s ease-in-out infinite alternate;
         }
 
         .goodbye-text {
-            font-size: 1.5rem;
+            margin-top: 20px;
             color: var(--primary-blue);
-            margin-bottom: 0.5rem;
-            opacity: 0;
+            font-weight: 500;
+            font-size: 1.5rem;
+            text-align: center;
             animation: fadeIn 0.5s ease forwards;
         }
 
         .message {
-            color: #666;
-            margin-bottom: 1rem;
-            opacity: 0;
-            animation: fadeIn 0.5s ease forwards 0.3s;
+            margin-top: 10px;
+            color: var(--primary-blue);
+            font-weight: 500;
+            font-size: 1.1rem;
+            text-align: center;
+            opacity: 0.8;
         }
 
         .redirect-text {
@@ -98,10 +103,15 @@ session_destroy();
             animation: fadeIn 0.5s ease forwards 0.6s;
         }
 
-        @keyframes cool {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes glowPulse {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
         }
 
         @keyframes fadeIn {
@@ -109,48 +119,105 @@ session_destroy();
             to { opacity: 1; }
         }
 
-        .cooling-effect {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+        .snowflake-loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin: 0 auto 1rem;
         }
 
-        .cooling-effect::before {
+        .snowflake-loader::before,
+        .snowflake-loader::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(26, 35, 126, 0.1) 0%, rgba(248, 249, 250, 0) 100%);
-            animation: coolDown 2s infinite;
+            border: 3px solid var(--light-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        @keyframes coolDown {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.1; }
-            100% { opacity: 0.3; }
+        .snowflake-loader::before {
+            animation: snowflake-pulse 2s ease-in-out infinite;
         }
+
+        .snowflake-loader::after {
+            animation: snowflake-pulse 2s ease-in-out infinite 1s;
+        }
+
+        .snowflake-loader i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary-blue);
+            font-size: 48px;
+            animation: snowflake-beat 2s ease-in-out infinite;
+        }
+
+        @keyframes snowflake-beat {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes snowflake-pulse {
+             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+             50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+             100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+         }
+
+        .progress-container {
+            width: 200px;
+            height: 4px;
+            background: var(--light-blue);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-blue);
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+         .loading-text {
+            margin-top: 20px;
+            color: var(--primary-blue);
+            font-weight: 500;
+            font-size: 1.1rem;
+         }
     </style>
 </head>
 <body>
-    <div class="cooling-effect"></div>
-    <div class="logout-container">
-        <i class="fas fa-snowflake aircon-icon"></i>
-        <h1 class="goodbye-text">Goodbye, <?= htmlspecialchars($adminName) ?>!</h1>
-        <p class="message">Thank you for using the Job Order System</p>
-        <p class="redirect-text">Redirecting to login page...</p>
+    <div class="snowflake-loader">
+        <i class="fas fa-snowflake"></i>
+    </div>
+    <div class="goodbye-text">Goodbye, <?= htmlspecialchars($adminName) ?>!</div>
+    <div class="loading-text">Thank you for using the Job Order System</div>
+    <div class="progress-container">
+        <div class="progress-bar"></div>
     </div>
 
     <script>
-        // Redirect after animation
-        setTimeout(() => {
-            window.location.href = '../index.php';
-        }, 3000);
+        // Animate progress bar
+        const progressBar = document.querySelector('.progress-bar');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 2;
+            progressBar.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                // Redirect after animation completes
+                setTimeout(() => {
+                    window.location.href = '../index.php';
+                }, 500);
+            }
+        }, 60); // Complete in 3 seconds (100 / 2 * 60ms = 3000ms)
     </script>
 </body>
-</html> 
+</html>

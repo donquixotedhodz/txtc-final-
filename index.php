@@ -92,17 +92,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
             font-family: 'Inter', sans-serif;
         }
         
-        .login-container {
-            max-width: 400px;
-            width: 100%;
-            padding: 2rem;
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
         
+        @keyframes glowPulse {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+        
+        
         .login-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(26, 35, 126, 0.2), 
+                        0 0 0 1px rgba(255, 255, 255, 0.2);
             padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .login-header {
@@ -148,9 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
             margin-bottom: 1rem;
         }
 
-        .password-field-container {
+        .form-floating {
             position: relative;
-            width: 100%;
         }
 
         .password-toggle {
@@ -180,38 +200,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
             outline: none;
         }
 
-        .password-field-container input {
-            padding-right: 35px;
+        .password-field {
+            padding-right: 35px !important;
         }
 
         .password-toggle i {
             font-size: 14px;
-        }
-
-        /* Fix form-floating label position */
-        .form-floating > .password-field-container > .form-control:focus ~ label,
-        .form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label {
-            transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
-            background-color: white;
-            padding: 0 0.25rem;
-            height: auto;
-        }
-
-        /* Ensure proper spacing for the floating label */
-        .form-floating > .password-field-container {
-            position: relative;
-        }
-
-        /* Fix input height and alignment */
-        .form-floating > .password-field-container > .form-control {
-            height: calc(3.5rem + 2px);
-            line-height: 1.25;
-        }
-
-        /* Ensure the toggle button doesn't overlap with the label */
-        .form-floating > .password-field-container > .form-control:focus ~ label ~ .password-toggle,
-        .form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label ~ .password-toggle {
-            top: 50%;
         }
 
         /* Add loading screen styles */
@@ -335,7 +329,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
         </div>
     </div>
 
-    <div class="login-container">
         <div class="login-card">
             <div class="login-header">
                 <div class="logo-circle">
@@ -359,13 +352,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
                 </div>
 
                 <div class="form-floating">
-                    <div class="password-field-container">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                       
-                        <button type="button" class="password-toggle" style="display: none;">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
+                    <input type="password" class="form-control password-field" id="password" name="password" placeholder=" " required>
+                    <label for="password">Password</label>
+                    <button type="button" class="password-toggle" style="display: none;">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 btn-login">
@@ -373,7 +364,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
                 </button>
             </form>
         </div>
-    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -384,6 +374,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['check_credentials'])
             const loadingScreen = document.querySelector('.loading-screen');
             const loginForm = document.querySelector('form');
             const progressBar = document.querySelector('.progress-bar');
+            const loginButton = document.querySelector('.btn-login');
+
+            // Ensure login button is clickable
+            loginButton.style.cursor = 'pointer';
+            loginButton.style.pointerEvents = 'auto';
 
             // Password toggle functionality
             passwordInput.addEventListener('input', function() {
